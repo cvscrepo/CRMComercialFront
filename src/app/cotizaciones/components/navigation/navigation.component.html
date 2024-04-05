@@ -1,0 +1,12 @@
+<mat-toolbar class="toolbar">
+  <span class="span-text text-title">CRM</span>
+  <button class="menu-text text-menu">Dashboard</button>
+  <button class="menu-text text-menu">Ventas</button>
+  <span class="spacer"></span>
+  <mat-icon class="icon-chat-unread">mark_unread_chat_alt</mat-icon>
+  <mat-icon class="icon-chat-unread" >camera_alt</mat-icon>
+  <button class="menu-right-text text-menu" (click)="toogle()" >{{nombreUsuario}}</button>
+</mat-toolbar>
+<ul class="menu-list z-40" *ngIf="menuProfile">
+  <li *ngFor="let item of menuItems"><mat-icon>{{item.svg}}</mat-icon> <a href="#" class="">{{item.item}}</a></li>
+</ul>

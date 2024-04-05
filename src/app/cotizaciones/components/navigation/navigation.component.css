@@ -1,0 +1,58 @@
+.toolbar{
+  background-color: #004A98;
+}
+.span-text{
+  color: white;
+  font-size: xx-large;
+  font-weight: 400;
+  margin-left: 15px;
+}
+
+.menu-text{
+  color: white;
+  margin-left: 2vmin;
+  font-weight: 200;
+  font-size: large;
+  padding: 1%;
+}
+
+.menu-right-text{
+  color: white;
+  font-weight: 300;
+}
+
+.icon-chat-unread{
+  color: white;
+  margin-right: 2vmin;
+}
+
+.menu-list {
+  position: absolute;
+  top: 7.5vmin;
+  right: 0.5vmin;
+  background-color: #f9f9f9;
+  width: 30vmin;
+}
+
+.menu-list li {
+  padding: 10px;
+  display: flex;
+  align-content: center;
+}
+
+.menu-list li a {
+  margin-left: 10px;
+  padding-top: 3px;
+}
+
+.text-title{
+  font-size: 4vmin;
+}
+
+.text-menu{
+  font-size: x-large;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}

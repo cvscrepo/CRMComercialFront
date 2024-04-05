@@ -1,0 +1,55 @@
+<form class=" shadow-lg rounded flex flex-col flex-start m-auto bg-white" [formGroup]="loginFormulario" (submit)="iniciarSesion()">
+
+  <img src="https://cvsccomc.site/images-shared/logocolvi.png" alt="" class="w-3/12 mt-6 ml-8">
+  <div class="mt-4 ml-8">
+    <label id="2" for="username" class="text-lg font-medium text-azulColvi">Iniciar sesión</label>
+  </div>
+  <div class="m-4 ml-8 mr-8 relative">
+    <input formControlName="email" [(ngModel)]="username" type="email" id="username" name="Correo electrónico"
+      placeholder="Correo electrónico"
+      class="py-2 pr-10 pl-2 w-full border border-transparent border-b-azulColvi focus:outline-none focus:rounded bg-inherit text-gris text-xs transition duration-300 ease-in-out transform hover:scale-105"
+      autocomplete="off"
+      [ngClass]="{ 'border-rojo border-b-rojo': loginFormulario.get('email')?.invalid && (loginFormulario.get('email')?.dirty || loginFormulario.get('email')?.touched) }">
+    <p [hidden]="!isEmaiil" [ngClass]="{'absolute b-0 text-xs text-rojo pt-1' : isEmaiil}">Usuario incorrecto</p>
+    <img src="https://cvsccomc.site/images-shared/emailSvg.svg"
+      class="absolute top-0 right-0 h-full mr-2 w-5 transition duration-300 ease-in-out transform hover:scale-105"
+      alt="Icono">
+  </div>
+  <div class="m-4 ml-8 mr-8 mb-10 relative">
+    <input formControlName="password" [(ngModel)]="contrasena" [type]="ocultarPassword ? 'password': 'text'" id="contrasena" name="password"
+      placeholder="Contraseña"
+      class="py-2 pr-10 pl-2 w-full border border-transparent border-b-azulColvi focus:outline-none focus:rounded  bg-inherit text-gris text-xs transition duration-300 ease-in-out transform hover:scale-105"
+      [ngClass]="{ 'border-rojo border-b-rojo': loginFormulario.get('passwors')?.invalid && loginFormulario.get('password')?.dirty && loginFormulario.get('password')?.touched }">
+    <p [hidden]="!isPassword" [ngClass]="{'absolute b-0 text-xs text-rojo pt-1' : isPassword}">Contraseña incorrecta</p>
+    @if (ocultarPassword) {
+      <img src="https://cvsccomc.site/images-shared/svgPassword.svg"
+      class="absolute top-0 right-0 h-full mr-2 w-5 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
+      alt="Icono" (click)="ocultarPassword=!ocultarPassword">
+    }@else {
+      <mat-icon class="absolute text-azulColvi top-1 right-0 h-full mr-2 w-5 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
+      (click)="ocultarPassword=!ocultarPassword">visibility</mat-icon>
+    }
+  </div>
+
+  <button type="submit"
+    [disabled]="loginFormulario.invalid || (!loginFormulario.get('email')?.value && !loginFormulario.get('password')?.value)"
+    class="bg-azulColvi w-28 m-auto mb-4 text-white rounded-sm p-1">Iniciar sesión</button>
+
+  <mat-card-footer>
+    <mat-progress-bar mode="indeterminate" *ngIf="mostrarLoading" color="bg-blue-500"></mat-progress-bar>
+  </mat-card-footer>
+</form>
+
+
+<!-- <div class="max-w-sm rounded overflow-hidden shadow-lg m-auto">
+  <img src="https://www.ambong-ambong.com/wp-content/uploads/2023/03/istockphoto-1172427455-612x612-1.jpeg" alt="Sunset in the sea" class="w-full">
+  <div class="px-6 py-4">
+    <div class="font-bold text-xl mb-2">The Coldest Sunset</div>
+    <p class="text-gray-700 text-base">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Architecto sapiente dolorum quaerat culpa, nisi possimus beatae fuga vero sit non sequi repudiandae corrupti est ratione consequatur hic voluptas et quam?</p>
+  </div>
+  <div class="px-6 py-4">
+    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold mr-2">#photography</span>
+    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold mr-2">#travel</span>
+    <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold ">#winter</span>
+  </div>
+</div> -->
