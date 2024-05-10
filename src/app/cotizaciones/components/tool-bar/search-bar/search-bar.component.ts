@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'crm-search-bar',
@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
 })
 export class SearchBarComponent {
 
+  @Output()
+  public termBusqueda: EventEmitter<string> = new EventEmitter<string>();
+
+  submitValue(value : string){
+    this.termBusqueda.emit(value);
+  }
 }

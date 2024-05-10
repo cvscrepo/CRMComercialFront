@@ -1,17 +1,28 @@
 <div class="flex flex-row">
-  @if (onlyCreate) {
+  @if (typeButtons === 0) {
     <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white">
-      <mat-icon class="icon-buttons">add</mat-icon>
-      <span>Crear</span>
+      <mat-icon class="icon-buttons py-1">add</mat-icon>
+      <span class="font-buttons">Crear</span>
     </button>
-  }@else {
+  }
+  @if(typeButtons === 2) {
     <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white">
-      <mat-icon class="icon-buttons">add</mat-icon>
-      <span>Crear</span>
+      <mat-icon class="icon-buttons py-1">add</mat-icon>
+      <span class="font-buttons">Crear</span>
     </button>
-    <button class="flex items-center justify-center gap-2 p-2 ml-5 bg-azulColvi rounded text-white">
-      <mat-icon class="icon-buttons">edit</mat-icon>
-      <span>Editar</span>
+    <button (click)="editCotizacion()" class="flex items-center justify-center gap-2 p-2 ml-5 bg-azulColvi rounded text-white">
+      <mat-icon class="icon-buttons py-1" >edit</mat-icon>
+      <span class="font-buttons">Editar</span>
+    </button>
+  }
+  @if(typeButtons === 3){
+    <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white" (click)="guardar()" [disabled]="getLoading()">
+      <mat-icon class="icon-buttons py-1">save</mat-icon>
+      <span class="font-buttons">Guardar</span>
+    </button>
+    <button class="flex items-center justify-center gap-2 p-2 ml-5 bg-azulColvi rounded text-white" (click)="discartChanges()" [disabled]="getLoading()">
+      <mat-icon class="icon-buttons py-1" >close</mat-icon>
+      <span class="font-buttons">Descartar</span>
     </button>
   }
 </div>

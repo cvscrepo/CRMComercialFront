@@ -1,5 +1,6 @@
 .toolbar{
   background-color: #004A98;
+  height: 50px;
 }
 .span-text{
   color: white;
@@ -28,7 +29,7 @@
 
 .menu-list {
   position: absolute;
-  top: 7.5vmin;
+  top: 6.0vmin;
   right: 0.5vmin;
   background-color: #f9f9f9;
   width: 30vmin;
@@ -46,11 +47,11 @@
 }
 
 .text-title{
-  font-size: 4vmin;
+  font-size: 3vmin;
 }
 
 .text-menu{
-  font-size: x-large;
+  font-size: large;
 }
 
 .spacer {

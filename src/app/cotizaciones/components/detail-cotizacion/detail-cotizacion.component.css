@@ -1,0 +1,19 @@
+.container{
+  width: 90rem;
+  height: 50rem;
+}
+
+.imagen{
+  background-image: url('https://cvsccomc.site/images-shared/logoCotizacionDetail.png'); /* Ruta de la imagen */
+  background-repeat: no-repeat;
+  background-position: center; /* Posición de la imagen */
+}
+
+.container-text{
+  width: 100%;
+}
+
+.input-text{
+  overflow-wrap: break-word;
+  flex-wrap: wrap;
+}

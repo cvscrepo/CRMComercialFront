@@ -1,0 +1,49 @@
+
+.table{
+  background-color: #e4e4e4f8;
+  font-size: small;
+}
+.checkbox{
+  width: 18px;
+  height: 18px;
+}
+
+.checkboxContainer{
+  padding-top: 6px;
+}
+
+.columns{
+  height: 10px;
+  font-size: small;
+  color: #777777;
+}
+
+.columns2{
+  height: 5px;
+  font-size: 11px;
+  color: #777777;
+}
+
+.rows{
+  height: 10px;
+  font-size: small;
+  color: #777777;
+  background-color: #f8f8f869;
+}
+
+.rows2{
+  height: 7px;
+  font-size: 11px;
+  color: #777777;
+  background-color: #f8f8f869;
+}
+
+.rows:hover{
+  color: #777777;
+  background-color: #f8f8f8e7;
+}
+
+.svg{
+  padding-top: 3px;
+}
+

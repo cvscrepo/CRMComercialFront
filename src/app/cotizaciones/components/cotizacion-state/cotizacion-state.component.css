@@ -1,0 +1,121 @@
+.borders{
+  border-left: 1px solid #B0B0B0; /* Color rojo para el borde izquierdo */
+  border-top: 1px solid transparent; /* Borde superior transparente */
+  border-right: 1px solid transparent; /* Borde derecho transparente */
+  border-bottom: 1px solid transparent;
+
+}
+
+.texto{
+  margin: 0 0 0 10px !important;
+}
+
+.containerT{
+  position: relative; /* Ancho del contenedor */
+  height: 50px; /* Altura del contenedor */
+  width: 120px;
+  padding: 0 0px 0 10px;
+  border: 1px solid #f8f8f8e7;
+}
+
+.container1{
+  position: relative; /* Ancho del contenedor */
+  height: 50px; /* Altura del contenedor */
+  width: 110px;
+  border: 1px solid #f8f8f8e7;
+
+}
+
+.container3{
+  position: relative; /* Ancho del contenedor */
+  height: 50px; /* Altura del contenedor */
+  width: 120px;
+  padding: 0 0px 0 20px;
+  border: 1px solid #f8f8f8e7;
+}
+
+.triangule2 {
+  position: absolute;
+  top: -2%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -21%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 26px 0 25px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #ffffff; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 99;
+}
+
+.triangule1 {
+  position: absolute;
+  top: -2%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -22%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 26px 0 25px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #ffffff; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 99;
+
+}
+.triangule3 {
+  position: absolute;
+  top: -2%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -21%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 26px 0 25px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #ffffff; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 99;
+}
+
+.trianguleActive {
+  position: absolute;
+  top: 0%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -23%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 24px 0 24px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #B0B0B0; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 999;
+}
+
+.trianguleActive2 {
+  position: absolute;
+  top: 0%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -21%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 24px 0 24px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #22C55E; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 99;
+}
+
+.trianguleActive3 {
+  position: absolute;
+  top: 0%; /* Posiciona el triángulo en el medio verticalmente */
+  right: -21%; /* Posiciona el triángulo en la parte derecha */
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 24px 0 24px 25px; /* Tamaño del triángulo */
+  border-color: transparent transparent transparent #f73e3e; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  z-index: 99;
+}
+
+.active{
+  background-color: #b0b0b0;
+  color: white;
+}
+.activeAprove{
+  background-color: #22C55E;
+  color: white;
+}
+.activeReject{
+  background-color: #f73e3e;
+  color: white;
+}
+

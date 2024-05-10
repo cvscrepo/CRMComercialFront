@@ -1,40 +1,143 @@
-<table mat-table [dataSource]="cotizacionList" class="mat-elevation-z8">
 
-  <ng-container matColumnDef="Cotización">
-    <th mat-header-cell *matHeaderCellDef> Cotización </th>
-    <td mat-cell *matCellDef="let element"> {{element.position}} </td>
-  </ng-container>
+@if (typeTable) {
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 table" >
 
-  <ng-container matColumnDef="Nombre del cliente">
-    <th mat-header-cell *matHeaderCellDef> Nombre del cliente </th>
-    <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-  </ng-container>
+    <ng-container matColumnDef="checkbox">
+      <th mat-header-cell *matHeaderCellDef class="checkboxContainer"><input type="checkbox" class="checkbox"></th>
+      <td mat-cell *matCellDef="let element" class="checkboxContainer"> <input type="checkbox" class="checkbox"> </td>
+    </ng-container>
 
-  <ng-container matColumnDef="Correo electrónico">
-    <th mat-header-cell *matHeaderCellDef> Correo electrónico </th>
-    <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
-  </ng-container>
+    <ng-container matColumnDef="Cotización">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Cotizacion"> Cotización </th>
+      <td mat-cell *matCellDef="let element"> {{element.nombre}} </td>
+    </ng-container>
 
-  <ng-container matColumnDef="Teléfono">
-    <th mat-header-cell *matHeaderCellDef> Teléfono </th>
-    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
-  </ng-container>
+    <ng-container matColumnDef="Cliente">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Cliente"> Nombre del cliente </th>
+      <td mat-cell *matCellDef="let element"> {{element.nombreCliente}} </td>
+    </ng-container>
 
-  <ng-container matColumnDef="Vendedor">
-    <th mat-header-cell *matHeaderCellDef> Vendedor </th>
-    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
-  </ng-container>
+    <ng-container matColumnDef="Correo">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Correo"> Correo electrónico </th>
+      <td mat-cell *matCellDef="let element"> {{element.emailCliente}} </td>
+    </ng-container>
 
-  <ng-container matColumnDef="Estado">
-    <th mat-header-cell *matHeaderCellDef> Estado </th>
-    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
-  </ng-container>
+    <ng-container matColumnDef="Telefono" >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Telefono"> Teléfono </th>
+      <td mat-cell *matCellDef="let element"> {{element.idClienteNavigation.telefono}} </td>
+    </ng-container>
 
-  <ng-container matColumnDef="Ingreso estimado">
-    <th mat-header-cell *matHeaderCellDef> Ingreso estimado </th>
-    <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
-  </ng-container>
+    <ng-container matColumnDef="Vendedor" class="">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Vendedor"> Vendedor </th>
+      <td mat-cell *matCellDef="let element"> {{element.vendedor}} </td>
+    </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
+    <ng-container matColumnDef="Estado">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let element">
+        <ng-container *ngIf="element.estado === 1">
+          <span class="rounded-lg bg-green-500 p-1 text-xs text-white">Aprobado</span>
+        </ng-container>
+        <ng-container *ngIf="element.estado === 2" class="pendiente">
+          <span class="rounded-lg bg-yellow-400 p-1 text-xs text-white">Pendiente</span>
+        </ng-container>
+        <ng-container *ngIf="element.estado !== 1 && element.estado !== 2" class="rechazado">
+          <span class="rounded-lg bg-red-400 p-1 text-xs text-white">Rechazado</span>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Ingreso">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="Ingreso" sortActionDescription="Sort by Vendedor"> Ingreso estimado </th>
+      <td mat-cell *matCellDef="let element"> {{ element.total | currency:'COP':'symbol-narrow':'1.2-2'}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="svg">
+      <th mat-header-cell *matHeaderCellDef><mat-icon class="svg">more_vert</mat-icon> </th>
+      <td mat-cell *matCellDef="let element"> {{""}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns" class="columns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="rows cursor-pointer border-2 hover:border-slate-400" (click)="emitValue(row.idCotizacion)" ></tr>
+
+  </table>
+  <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons aria-label="Select page of periodic elements" class="border-2 border-gray">
+  </mat-paginator>
+  <div class="h-5 bg-grisText grid grid-col-7 mt-5 text-center aling-middle ">
+    <span class="col-end-7 text-white col-span-1 ">Total aprobadas: {{total | currency:'COP':'symbol-narrow':'1.2-2'}}</span>
+  </div>
+}@else{
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 table mt-2" >
+
+    <ng-container matColumnDef="Cotización">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Cotizacion"> Cotización </th>
+      <td mat-cell *matCellDef="let element"> {{element.nombre}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Cliente">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Cliente"> Nombre Cliente </th>
+      <td mat-cell *matCellDef="let element"> {{element.idClienteNavigation.nombreCompleto}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Vendedor" class="">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Vendedor"> Vendedor </th>
+      <td mat-cell *matCellDef="let element"> {{element.idUsuarioNavigation.nombreCompleto}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Estado">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let element">
+        <ng-container *ngIf="element.estado === 1">
+          <span class="rounded-lg bg-green-500 p-1 text-xs text-white">Aprobado</span>
+        </ng-container>
+        <ng-container *ngIf="element.estado === 2" class="pendiente">
+          <span class="rounded-lg bg-yellow-400 p-1 text-xs text-white">Pendiente</span>
+        </ng-container>
+        <ng-container *ngIf="element.estado !== 1 && element.estado !== 2" class="rechazado">
+          <span class="rounded-lg bg-bgRed p-1 text-xs text-white">Rechazado</span>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="Ingreso">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header="Ingreso" sortActionDescription="Sort by Vendedor"> Ingreso estimado </th>
+      <td mat-cell *matCellDef="let element"> {{ element.total | currency:'COP':'symbol-narrow':'1.2-2'}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns2" class="columns2"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns2;" class="rows2 cursor-pointer border-2 hover:border-slate-400" (click)="emitValue(row.idCotizacion)" ></tr>
+
+  </table>
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements" class="border-2 border-gray w-full">
+  </mat-paginator>
+}
+
+
+  <!-- <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2 table">
+
+    <ng-container *ngFor="let column of displayedColumns">
+      @if(column == 'checkbox'){
+        <ng-container [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header [innerHTML]="theHtmlString" > {{obtenerTituloColumna(column)}} </th>
+          <td mat-cell *matCellDef="let element" [class.hidden]="!mostrarColumnas(column)" [innerHTML]="theHtmlString" >
+            {{ obtenerValorColumna(element, column) }}
+          </td>
+        </ng-container>
+      }@else {
+        <ng-container [matColumnDef]="column">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ obtenerTituloColumna(column)}}</th>
+          <td mat-cell *matCellDef="let element" [class.hidden]="!mostrarColumnas(column)" >
+            {{ obtenerValorColumna(element, column) }}
+          </td>
+        </ng-container>
+      }
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="rows cursor-pointer border-2 hover:border-slate-400" (click)="emitValue(row.idCotizacion)"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons aria-label="Select page of periodic elements" class="border-2 border-gray"></mat-paginator>
+  <div class="h-5 bg-grisText grid grid-col-7 mt-5 text-center aling-middle">
+    <span class="col-end-7 text-white col-span-1">Total aprobadas: {{ total | currency:'COP':'symbol-narrow':'1.2-2' }}</span>
+  </div> -->

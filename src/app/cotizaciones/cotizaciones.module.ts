@@ -14,6 +14,15 @@ import { FilterAndGroupButtonComponent } from './components/tool-bar/filter-and-
 import { PrintAndActionButtonComponent } from './components/tool-bar/print-and-action-button/print-and-action-button.component';
 import { CreateAndEditButtonComponent } from './components/tool-bar/create-and-edit-button/create-and-edit-button.component';
 import { CotizacionTableComponent } from './components/cotizacion-table/cotizacion-table.component';
+import { CotizacionDetailComponent } from './components/cotizacion-detail/cotizacion-detail.component';
+import { CotizacionStateComponent } from './components/cotizacion-state/cotizacion-state.component';
+import { HorizontalMenuComponent } from './components/horizontal-menu/horizontal-menu.component';
+import { ListaDetalleCotizacionComponent } from './components/cotizacion-detail/lista-detalle-cotizacion/lista-detalle-cotizacion.component';
+import { LateralListComponent } from './components/cotizacion-detail/lateral-list/lateral-list.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FilterCotizacionPipe } from './pipes/filter-cotizacion.pipe';
+import { LoadingComponent } from './components/loading/loading.component';
+import { DetailCotizacionComponent } from './components/detail-cotizacion/detail-cotizacion.component';
 
 
 @NgModule({
@@ -28,12 +37,26 @@ import { CotizacionTableComponent } from './components/cotizacion-table/cotizaci
     FilterAndGroupButtonComponent,
     PrintAndActionButtonComponent,
     CreateAndEditButtonComponent,
-    CotizacionTableComponent
+    CotizacionTableComponent,
+    CotizacionDetailComponent,
+    CotizacionStateComponent,
+    HorizontalMenuComponent,
+    ListaDetalleCotizacionComponent,
+    LateralListComponent,
+    FilterCotizacionPipe,
+    LoadingComponent,
+    DetailCotizacionComponent
   ],
   imports: [
     CommonModule,
     CotizacionesRoutingModule,
-    MaterialModule
+    MaterialModule,
+    FormsModule,
+    ReactiveFormsModule
+  ],
+  exports: [
+    MaterialModule,
+    NavigationComponent,
   ]
 })
 export class CotizacionesModule { }

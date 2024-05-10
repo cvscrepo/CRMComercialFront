@@ -1,14 +1,8 @@
-<section>
-  <nav>
-    <crm-navigation-component></crm-navigation-component>
-  </nav>
-  <article>
-    <crm-tool-bar></crm-tool-bar>
+<section class="h-full bg-gray-100">
+  <article class="bg-white ">
+    <crm-tool-bar (termBusqueda)="emitValue($event)" [type]="0" ></crm-tool-bar>
   </article>
-  <div>
-    <crm-cotizacion-table></crm-cotizacion-table>
-  </div>
-
-
-  <p>lista-cotizacion-page works!</p>
+  <article>
+    <crm-cotizacion-table [termBusqueda]="termBusqueda" ></crm-cotizacion-table>
+  </article>
 </section>

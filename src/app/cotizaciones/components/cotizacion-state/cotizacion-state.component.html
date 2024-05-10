@@ -1,0 +1,20 @@
+<section class="flex justify-end">
+  <div class="flex items-center justify-center text-center p-2 border text-grisText borders">
+    <mat-icon class="py-0">public</mat-icon>
+    <p class="texto">Cliente previsualizar</p>
+  </div>
+</section>
+<mat-divider></mat-divider>
+<section class="grid grid-cols-10">
+  <div class="col-span-6">
+    <h2>{{numeroCotizacion}}</h2>
+  </div>
+  <div class="col-span-4 flex justify-end flex-row mr-5">
+    <button class="container1" [ngClass]="estado === 2 ? 'active' : ''" (click)="onClick(2)" [disabled]="isDisabled" ><span class="triangule1"
+        [ngClass]="estado === 2 ? 'trianguleActive' : ''"></span> Pendiente</button>
+    <button class="containerT text-center" [ngClass]="estado === 1 ? 'activeAprove' : ''" (click)="onClick(1)" [disabled]="isDisabled" ><span class="triangule2"
+        [ngClass]="estado === 1 ? 'trianguleActive2' : ''"></span> Aprobada</button>
+    <button class="container3 text-center" [ngClass]="estado === 3 ? 'activeReject' : ''" (click)="onClick(3)" [disabled]="isDisabled" ><span class="triangule3"
+        [ngClass]="estado === 3 ? 'trianguleActive3' : ''"></span> Rechazada</button>
+  </div>
+</section>

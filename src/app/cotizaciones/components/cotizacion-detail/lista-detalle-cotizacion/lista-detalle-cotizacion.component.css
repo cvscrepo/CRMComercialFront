@@ -1,0 +1,21 @@
+.columns{
+  height: 30px;
+  font-size: small;
+  color: #777777;
+  padding: 0%;
+  width: 10px;
+}
+
+.table{
+  background-color: #e4e4e4f8;
+  font-size: small;
+  margin-top: 20px;
+}
+
+.rows{
+  height: 40px;
+  font-size: small;
+  color: #777777;
+  background-color: #f8f8f869;
+}
+

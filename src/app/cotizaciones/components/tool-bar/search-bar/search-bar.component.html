@@ -1,4 +1,4 @@
-<div class="flex flex-row alin-center mt-7 relative text-grisText">
-  <input type="text" placeholder="Buscar..." class="w-full mx-5 rounded bg-inherit border-2 border-grisText p-2" >
+<div class="flex flex-row  mt-7 relative text-grisText">
+  <input type="text" matInput placeholder="Buscar..." #inputSearch class="w-full mx-5 rounded bg-inherit border border-gris p-2"  (keyup.enter)="submitValue(inputSearch.value)" >
   <mat-icon class="absolute right-7 top-2">search</mat-icon>
 </div>

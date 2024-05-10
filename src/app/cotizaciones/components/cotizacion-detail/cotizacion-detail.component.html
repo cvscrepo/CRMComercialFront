@@ -1,0 +1,49 @@
+@if (getLoading()) {
+<crm-loading></crm-loading>
+}
+<crm-cotizacion-state [estado]="cotizacion.estado === undefined ? 0 : cotizacion.estado " [numeroCotizacion]="cotizacion.numeroDocumento === undefined ? 00001 : cotizacion.numeroDocumento" (estadoChanged)="estadoChanged($event)"
+  [isDisabled]="!getDisabledState()"></crm-cotizacion-state>
+<section class="flex">
+  <div class="mt-10 mr-5 mb-5 ">
+    <p class="block pb-5">Cliente</p>
+    <p class="block pb-5">Vendedor</p>
+    <p class="block ">Expiración</p>
+  </div>
+  <div class="mt-9 relative" #selectContainer>
+    <input (click)="getClienteList()" [(ngModel)]="busquedaCliente" class="p-1 rounded-sm block mb-6 w-80"
+      [disabled]="!getDisabledState()" [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
+    <select size="5" [(ngModel)]="clienteSeleccionado" *ngIf="mostrarList === 1" (change)="seleccionarCampo(true)"
+      class="bg-white w-80 absolute top-8 truncate border-2 rounded border-inputBg mi-select">
+      <option [value]="0">Seleccionar un campo</option>
+      <option *ngFor="let cliente of clienteList | filterCotizacion: busquedaCliente" [value]="cliente.idCliente">
+        {{cliente.nombreCompleto}}</option>
+    </select>
+    <input list="lista-clientes" (click)="getUserList()" [(ngModel)]="busquedaUsuario"
+      class=" p-1 rounded-sm block mb-6 w-80 " [disabled]="!getDisabledState()"
+      [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
+    <select size="5" [(ngModel)]="usuarioSeleccionado" *ngIf="mostrarList === 2" (change)="seleccionarCampo(false)"
+      class="bg-white w-80 absolute top-20 truncate border-2 rounded border-inputBg mi-select">
+      <option [value]="0">Seleccionar un campo</option>
+      <option *ngFor="let usuario of usuarioList | filterCotizacion: busquedaUsuario" [value]="usuario.idUsuario">
+        {{usuario.nombreCompleto}}</option>
+    </select>
+    <input type="datetime-local" [disabled]="!getDisabledState()" [(ngModel)]="expirationDate"
+      (ngModelChange)="onFechaSeleccionada()" required>
+  </div>
+</section>
+<crm-horizontal-menu></crm-horizontal-menu>
+<crm-lista-detalle-cotizacion [detalleCotizacionList]="detalleCotizacionList"></crm-lista-detalle-cotizacion>
+<div class="grid grid-col-4 mt-20">
+  <div class="w-full col-start-4">
+    <div class="flex flex-row">
+      <p class="pr-5">Impuestos:</p>
+      <p>{{cotizacion.valorIva === undefined ? 0 : cotizacion.valorIva }}</p>
+    </div>
+    <mat-divider>
+    </mat-divider>
+    <div class="flex flex-row mt-5">
+      <p class="pr-5 ">Total:</p>
+      <p> {{cotizacion.total === undefined ? 0 : cotizacion.total}} </p>
+    </div>
+  </div>
+</div>

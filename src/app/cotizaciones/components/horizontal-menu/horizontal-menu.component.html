@@ -1,0 +1,12 @@
+<ul class="nav nav-tabs">
+  <li class="nav-item"><a href="" data-toggle="tab" disable_anchor="true" role="tab" aria-selected="false"
+      class="nav-link" (click)="setActiveLink(1)" [ngClass]="{'active': activeLink == 1}"
+      onclick="event.preventDefault()">Detalles de cotización</a></li>
+  <li class="nav-item"><a href="" data-toggle="tab" disable_anchor="true" role="tab" aria-selected="false"
+      class="nav-link" (click)="setActiveLink(2)" [ngClass]="{'active': activeLink === 2}"
+      onclick="event.preventDefault()">Dotación</a></li>
+  <li class="nav-item"><a href="" data-toggle="tab" disable_anchor="true" role="tab" aria-selected="false"
+      class="nav-link" (click)="setActiveLink(3)" [ngClass]="{'active': activeLink == 3}"
+      onclick="event.preventDefault()">Más</a></li>
+</ul>
+

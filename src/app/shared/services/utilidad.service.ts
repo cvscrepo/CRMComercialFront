@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
 
 @Injectable({providedIn: 'root'})
 export class UtilidadService {
 
   constructor(private _snackBar:MatSnackBar) { }
 
-  mostrarAlerta(mensaje:string, tipo:string){
+  mostrarAlerta(mensaje:string, tipo:string, verticalPosition :MatSnackBarVerticalPosition = "top", horizontalPosition: MatSnackBarHorizontalPosition = "end" ){
     this._snackBar.open(mensaje,tipo, {
-      horizontalPosition: "end",
-      verticalPosition:"top",
-      duration:3000
+      horizontalPosition: horizontalPosition,
+      verticalPosition:verticalPosition,
+      duration:4000
     })
   }
 

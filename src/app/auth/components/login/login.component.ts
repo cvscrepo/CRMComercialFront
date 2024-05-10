@@ -58,11 +58,16 @@ export class LoginComponent {
           this.mostrarLoading = false;
         },
         error: (error) => {
-          this.utilidad.mostrarAlerta(`${error.error.message}`, "Opps!");
-          this.isEmaiil = true;
-          this.isPassword = true;
-          this.mostrarLoading = false;
-          console.error("error " + error);
+          if(error.status === 0){
+            this.utilidad.mostrarAlerta("No se pudo tener conexión con el servidor", "Error!");
+            this.mostrarLoading = false;
+          }
+          else{
+            this.utilidad.mostrarAlerta(`${error.error.message}`, "Opps!");
+            this.isEmaiil = true;
+            this.isPassword = true;
+            this.mostrarLoading = false;
+          }
         }
       });
     } else {

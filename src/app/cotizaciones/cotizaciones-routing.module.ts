@@ -10,8 +10,8 @@ const routes: Routes = [{
   component: LayoutPageComponent,
   children: [
     {path: 'list', component: ListaCotizacionPageComponent},
-    {path: 'new-cotizacion', component: NewCotizacionPageComponent},
-    {path: 'detalle-cotizacion', component: DetalleCotizacionPageComponent},
+    {path: 'newcotizacion', component: NewCotizacionPageComponent},
+    {path: 'detallecotizacion/:id', component: DetalleCotizacionPageComponent},
     {path: '**', redirectTo: 'list'}
   ]
 }];
