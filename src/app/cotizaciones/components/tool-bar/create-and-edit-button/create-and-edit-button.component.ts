@@ -12,6 +12,8 @@ export class CreateAndEditButtonComponent {
   @Input()
   public typeButtons: number = 1;
 
+  @Input()
+  public newCotizacionObjetc?:Cotizacion;
   constructor(private cotizacionService:CotizacionService){
 
   }
@@ -22,18 +24,13 @@ export class CreateAndEditButtonComponent {
 
   guardar(){
     this.cotizacionService.setLoading();
-    this.cotizacionService.editarCotizacion()?.subscribe({
-      next: (data: responseApi<Cotizacion>) => {
-        if(data.success){
-          console.log(data.value);
-          setTimeout(() => {
-            this.cotizacionService.setLoading();
-            this.typeButtons = 2;
-            this.cotizacionService.isDisabled = false
-          }, 2000);
-        }
-      }
-    })
+    if(this.cotizacionService.stateNuevaCotizacion){
+      console.log("entró");
+      this.cotizacionService.guardarCotizacion();
+      this.cotizacionService.setLoading();
+    }else{
+      this.cotizacionService.editarCotizacion();
+    }
   }
 
   public editCotizacion(){

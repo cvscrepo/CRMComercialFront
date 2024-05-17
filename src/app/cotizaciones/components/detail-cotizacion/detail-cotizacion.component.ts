@@ -35,14 +35,13 @@ export class DetailCotizacionComponent implements OnInit {
   public loading: boolean = false;
   public editMode: boolean = false;
 
-
   //Lista de dias de la semana
   public diasDeLaSemana = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo', 'Festivo'];
 
 
   constructor(
     public dialogRef: MatDialogRef<DetailCotizacionComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { detalle: DetalleCotizacion, editMode: boolean, newDetail: boolean },
+    @Inject(MAT_DIALOG_DATA) public data: { detalle: DetalleCotizacion, editMode: boolean, newDetail: boolean, index : number },
     private formBiulder: FormBuilder,
     private cotizacionService: CotizacionService,
     private detalleCotizacionService: DetalleCotizacionService,
@@ -51,6 +50,9 @@ export class DetailCotizacionComponent implements OnInit {
     this.editMode = this.data.editMode;
     this.listaSucursales = this.cotizacionService.listaSucursal;
     this.listaServicios = this.cotizacionService.listaServicios;
+    console.log("Constructor")
+    console.log(this.listaServicios);
+    console.log(this.listaSucursales);
   }
 
 
@@ -137,7 +139,7 @@ export class DetailCotizacionComponent implements OnInit {
   initializelEmptyForm() {
     this.detalleCotizacionForm = this.formBiulder.group({
       idDetalleCotizacion: 0,
-      idCotizacion: this.cotizacionService.cotizacionById?.idCotizacion,
+      idCotizacion: this.cotizacionService.cotizacionById?.idCotizacion ?? 0,
       idServicio: 0,
       idSucursal: 0,
       cantidadServicios: 1,
@@ -320,6 +322,30 @@ export class DetailCotizacionComponent implements OnInit {
     const listaEditada = this.armadoAndSMLVCheck(listaConSumaDiasRequeridos);
     this.detalleCotizacionForm.value.detalleCotizacionVariables = listaEditada;
     if (this.data.newDetail) {
+      console.log(this.cotizacionService.nuevaCotizacion)
+      if(this.cotizacionService.nuevaCotizacion){
+        const sucursalFound = this.listaSucursales.find(s => s.idSucursal === this.detalleCotizacionForm.value.idSucursal);
+        const servicioFuond = this.listaServicios.find(s => s.idServicio === this.detalleCotizacionForm.value.idServicio);
+        this.detalleCotizacionForm.value.idSucursalNavigation = sucursalFound;
+        this.detalleCotizacionForm.value.idServicioNavigation = servicioFuond;
+        this.detalleCotizacionForm.value.detalleCotizacionInventarios = [];
+        //Actualizar valor total
+        console.log(this.detalleCotizacionForm.value);
+        this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+          next: (data) => {
+            console.log(this.detalleCotizacionForm.value);
+            this.detalleCotizacionForm.value.total = data.value;
+          },
+          error: (e)=> {
+            console.error(e);
+          }
+        });
+        this.cotizacionService.addData(this.detalleCotizacionForm.value);
+        this.onNoClick();
+        this.loading = false;
+        console.log(this.detalleCotizacionForm.value);
+        return;
+      }
       this.detalleCotizacionService.createDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
         next: (data) => {
           this.loading = false;
@@ -330,6 +356,26 @@ export class DetailCotizacionComponent implements OnInit {
       });
       console.log(this.detalleCotizacionForm.value);
     } else {
+      if(this.cotizacionService.nuevaCotizacion){
+        const listaDetalle = this.cotizacionService.getDetalleCotizacionToCreate();
+        this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+          next: (data) => {
+            console.log(this.detalleCotizacionForm.value);
+            this.detalleCotizacionForm.value.total = data.value;
+            listaDetalle.splice(this.data.index, 1, this.detalleCotizacionForm.value);
+
+          },
+          error: (e)=> {
+            console.error(e);
+          }
+        });
+        console.log(this.data.index);
+        console.log(listaDetalle);
+        this.onNoClick();
+        this.loading = false;
+        return;
+      }
+      console.log(this.detalleCotizacionForm.value);
       this.detalleCotizacionService.editDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
         next: () => {
           this.loading = false

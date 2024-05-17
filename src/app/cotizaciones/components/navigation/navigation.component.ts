@@ -31,4 +31,5 @@ export class NavigationComponent implements OnInit {
   {
     this.menuProfile = !this.menuProfile;
   }
+
 }

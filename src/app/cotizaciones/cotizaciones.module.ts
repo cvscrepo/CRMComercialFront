@@ -23,6 +23,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FilterCotizacionPipe } from './pipes/filter-cotizacion.pipe';
 import { LoadingComponent } from './components/loading/loading.component';
 import { DetailCotizacionComponent } from './components/detail-cotizacion/detail-cotizacion.component';
+import { SelectsOfCotizacionComponent } from './components/cotizacion-detail/selects-of-cotizacion/selects-of-cotizacion.component';
+import { ButtonAddDetailComponent } from './components/cotizacion-detail/button-add-detail/button-add-detail.component';
 
 
 @NgModule({
@@ -45,7 +47,9 @@ import { DetailCotizacionComponent } from './components/detail-cotizacion/detail
     LateralListComponent,
     FilterCotizacionPipe,
     LoadingComponent,
-    DetailCotizacionComponent
+    DetailCotizacionComponent,
+    SelectsOfCotizacionComponent,
+    ButtonAddDetailComponent,
   ],
   imports: [
     CommonModule,

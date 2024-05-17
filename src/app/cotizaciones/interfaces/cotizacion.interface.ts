@@ -28,3 +28,13 @@ export interface Cotizacion {
 
 
 
+export interface CotizacionDTO {
+  idCotizacion:        number;
+  idCliente:           number;
+  idUsuario:           number;
+  nombre:              string;
+  descripcion:         string;
+  estado:              number;
+  total:               number;
+  detalleCotizacions:  DetalleCotizacion[];
+}

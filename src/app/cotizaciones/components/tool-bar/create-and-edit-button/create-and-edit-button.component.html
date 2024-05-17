@@ -1,12 +1,12 @@
 <div class="flex flex-row">
   @if (typeButtons === 0) {
-    <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white">
+    <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white" routerLink="/cotizacion/newcotizacion">
       <mat-icon class="icon-buttons py-1">add</mat-icon>
       <span class="font-buttons">Crear</span>
     </button>
   }
   @if(typeButtons === 2) {
-    <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white">
+    <button class="flex items-center justify-center mx-5 gap-2 p-2 pr-4 bg-azulColvi rounded text-white" [routerLink]="['/cotizacion/newcotizacion']">
       <mat-icon class="icon-buttons py-1">add</mat-icon>
       <span class="font-buttons">Crear</span>
     </button>

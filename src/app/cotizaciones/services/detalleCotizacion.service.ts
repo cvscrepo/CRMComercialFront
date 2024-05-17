@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
 import { envirnoments } from '../../../environments/environments';
 import { responseApi } from '../../shared/interfaces/response.interface';
 import { DetalleCotizacion } from '../interfaces/detalleCotizacion.interface';
+import { UtilidadService } from '../../shared/services/utilidad.service';
 
 @Injectable({providedIn: 'root'})
 export class DetalleCotizacionService {
@@ -13,7 +14,11 @@ export class DetalleCotizacionService {
   //States
   public detalleCotizacion:DetalleCotizacion[] = [];
   public detalleEditado?:DetalleCotizacion;
-  constructor(private http:HttpClient) { }
+  public loading:boolean = false;
+
+  constructor(
+    private http:HttpClient
+  ) { }
 
   getDetalleCotizacionByIdCotizacion(id:number){
     return this.http.get<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion/id?id=${id}`)
@@ -36,6 +41,16 @@ export class DetalleCotizacionService {
     .pipe(
       tap(detalleEditado => {console.log(detalleEditado)}),
       catchError((e) => {console.error(e); return throwError(e)})
+    )
+  }
+
+  deleteDetalleCotizacion(detalle:DetalleCotizacion):Observable<responseApi<boolean>>{
+    return this.http.delete<responseApi<boolean>>(`${this.urlBase}/api/DetalleCotizacion?id=${detalle.idDetalleCotizacion}`)
+    .pipe(
+      tap(data => {
+        console.log(data);
+      }),
+
     )
   }
 

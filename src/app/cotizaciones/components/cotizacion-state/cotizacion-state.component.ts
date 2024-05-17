@@ -6,13 +6,18 @@ import { Component, EventEmitter, Input, Output, output } from '@angular/core';
   styleUrl: './cotizacion-state.component.css'
 })
 export class CotizacionStateComponent {
+
   @Input()
   public estado:number = 2;
   @Input()
-  public numeroCotizacion: number = 1;
+  public numeroCotizacion?: number = 1;
   @Input()
-  public isDisabled: boolean = true;
+  public isDisabled?: boolean = true;
 
+  constructor(){
+
+    console.log("estado",this.estado)
+  }
   @Output()
   public estadoChanged : EventEmitter<number> = new EventEmitter<number>();
   onClick(id:number){
