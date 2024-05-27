@@ -5,53 +5,82 @@ import { envirnoments } from '../../../environments/environments';
 import { responseApi } from '../../shared/interfaces/response.interface';
 import { DetalleCotizacion } from '../interfaces/detalleCotizacion.interface';
 import { UtilidadService } from '../../shared/services/utilidad.service';
+import { CotizacionService } from './cotizacion.service';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class DetalleCotizacionService {
   //HttpUrl
-  public urlBase:string = envirnoments.baseUrl;
+  public urlBase: string = envirnoments.baseUrl;
 
   //States
-  public detalleCotizacion:DetalleCotizacion[] = [];
-  public detalleEditado?:DetalleCotizacion;
-  public loading:boolean = false;
+  public detalleCotizacion: DetalleCotizacion[] = [];
+  public detalleEditado?: DetalleCotizacion;
+  public loading: boolean = false;
 
   constructor(
-    private http:HttpClient
+    private http: HttpClient,
+    private _cotizacionService: CotizacionService,
+    private fb: FormBuilder
   ) { }
 
-  getDetalleCotizacionByIdCotizacion(id:number){
+  getDetalleCotizacionByIdCotizacion(id: number) {
     return this.http.get<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion/id?id=${id}`)
       .pipe(
-        tap(detalleCotizacion => {console.log(detalleCotizacion.value, "Detalle Cotizacion" ); return this.detalleCotizacion = detalleCotizacion.value}),
-        catchError((e:any) => {console.error(e); return throwError(e)})
+        tap(detalleCotizacion => {
+          console.log(detalleCotizacion.value, "Detalle Cotizacion");
+          for (const detalleCotizacio of detalleCotizacion.value) {
+            console.log("detalleCotizacionnn", detalleCotizacion);
+            const detalleCotizacionArray = this._cotizacionService.form?.get('detalleCotizacions') as FormArray;
+            const detalleCotizacionFormGroup = this.fb.group({
+              idDetalleCotizacion: [detalleCotizacio.idDetalleCotizacion, Validators.required],
+              idServicio: [detalleCotizacio.idServicio , Validators.required],
+              idSucursal: [detalleCotizacio.idSucursal , Validators.required],
+              idCotizacion: [detalleCotizacio.idCotizacion , Validators.required],
+              cantidadServicios: [detalleCotizacio.cantidadServicios , Validators.required],
+              detalleServicio: [detalleCotizacio.detalleServicio],
+              total: [detalleCotizacio.total],
+              detalleCotizacionVariables: [detalleCotizacio.detalleCotizacionVariables, Validators.required],
+              idServicioNavigation: [detalleCotizacio.idServicioNavigation, Validators.required],
+              idSucursalNavigation: [detalleCotizacio.idSucursalNavigation, Validators.required],
+            });
+            detalleCotizacionArray.push(detalleCotizacionFormGroup);
+
+          }
+          return this.detalleCotizacion = detalleCotizacion.value
+        }),
+        catchError((e: any) => { console.error(e); return throwError(e) })
       );
   }
 
-  createDetalleCotizacion(detalleCotizacion:DetalleCotizacion){
+  createDetalleCotizacion(detalleCotizacion: DetalleCotizacion) {
     return this.http.post<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion`, detalleCotizacion)
       .pipe(
-        tap(detalleCotizacion => {console.log(detalleCotizacion.value, "Detalle Cotizacion" ); return this.detalleCotizacion = detalleCotizacion.value}),
-        catchError((e:any) => {console.error(e); return throwError(e)})
+        tap(detalleCotizacion => { console.log(detalleCotizacion.value, "Detalle Cotizacion"); return this.detalleCotizacion = detalleCotizacion.value }),
+        catchError((e: any) => { console.error(e); return throwError(e) })
       );
   }
 
-  editDetalleCotizacion(detalle:DetalleCotizacion):Observable<responseApi<DetalleCotizacion[]>>{
+  editDetalleCotizacion(detalle: DetalleCotizacion): Observable<responseApi<DetalleCotizacion[]>> {
     return this.http.put<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion`, detalle)
-    .pipe(
-      tap(detalleEditado => {console.log(detalleEditado)}),
-      catchError((e) => {console.error(e); return throwError(e)})
-    )
+      .pipe(
+        tap(detalleEditado => { console.log(detalleEditado) }),
+        catchError((e) => { console.error(e); return throwError(e) })
+      )
   }
 
-  deleteDetalleCotizacion(detalle:DetalleCotizacion):Observable<responseApi<boolean>>{
+  deleteDetalleCotizacion(detalle: DetalleCotizacion): Observable<responseApi<boolean>> {
     return this.http.delete<responseApi<boolean>>(`${this.urlBase}/api/DetalleCotizacion?id=${detalle.idDetalleCotizacion}`)
-    .pipe(
-      tap(data => {
-        console.log(data);
-      }),
+      .pipe(
+        tap(data => {
+          console.log(data);
+        }),
 
-    )
+      )
+  }
+
+  get detalleCotizacionList(): DetalleCotizacion[] {
+    return this.detalleCotizacion;
   }
 
   public esFormatoHora(cadena: string): boolean {
@@ -89,7 +118,7 @@ export class DetalleCotizacionService {
   }
 
   listarHoras() {
-    let listaHoras : string[] = [];
+    let listaHoras: string[] = [];
     if (listaHoras.length === 0) {
       for (let index = 0; index < 24; index++) {
         if (index.toString().length === 1) {

@@ -12,6 +12,7 @@ import { DetalleCotizacion, DetalleCotizacionVariable, VariablesEconomicasNaviga
 import { Servicio } from '../interfaces/servicio.interface';
 import { Sucursal } from '../interfaces/sucursal.interface';
 import { Route, Router } from '@angular/router';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable({ providedIn: 'root' })
 export class CotizacionService {
@@ -48,17 +49,51 @@ export class CotizacionService {
   private detalleCotizacionToCreate = new BehaviorSubject<DetalleCotizacion[]>([]);
   data$ = this.detalleCotizacionToCreate.asObservable();
 
+  private formSubject = new BehaviorSubject<FormGroup | undefined>(undefined);
+  private formStatesSubject = new BehaviorSubject<FormGroup | undefined>(undefined);
+
   constructor(
     private http: HttpClient,
-    private route : Router
+    private route : Router,
+    private fb: FormBuilder
   ) {
-    console.log("Servicio de countries");
+    this.initForm();
   }
 
 
   // Se necesita el get all de cotización
   // Se necesita el get id de cotización
   //
+
+
+  private initForm() {
+    const form = this.fb.group({
+      idCotizacion: [0, [Validators.required]],
+      nombre: ['', [Validators.required]],
+      idCliente: [0, [Validators.required]],
+      idUsuario: [0, [Validators.required]],
+      expiracion: ['', [Validators.required]],
+      descripcion: [''],
+      comentarios: [''],
+      estado: [0, [Validators.required]],
+      detalleCotizacions: this.fb.array([])
+
+    });
+    this.formSubject.next(form);
+    const myStates = this.fb.group({
+      termOfSearchClient: [''],
+      termOfSearchUser: ['']
+    });
+    this.formStatesSubject.next(myStates);
+  }
+
+  get form() {
+    return this.formSubject.value;
+  }
+
+  get myFormStates() {
+    return this.formStatesSubject.value;
+  }
 
   getAllCotizacion() {
     return this.http.get<responseApi<Cotizacion[]>>(`${this.urlBase}/api/Cotizacion`)
@@ -73,7 +108,14 @@ export class CotizacionService {
       .pipe(
         tap(cotizacion => {
           this.cotizacionById = cotizacion.value;
-          this.cotizacionByIdSubject.next(cotizacion.value);
+          this.form?.patchValue(cotizacion.value);
+
+          //DetalleCotizacion to form group
+          const detalleCotizacionArray = this.form?.get('detalleCotizacions') as FormArray;
+          const termOfSearchClient = this.myFormStates!.controls['termOfSearchClient'];
+          const termOfSearchUser = this.myFormStates!.get('termOfSearchUser');
+          termOfSearchClient.setValue(cotizacion.value.idClienteNavigation.nombreCompleto);
+          termOfSearchUser!.setValue(cotizacion.value.idUsuarioNavigation.nombreCompleto);
         }),
         catchError((e: any) => { console.error(e); return throwError(e) })
       );
@@ -100,6 +142,10 @@ export class CotizacionService {
 
   get cotizacionByIdValue(){
     return this.cotizacionById;
+  }
+
+  get disabledState(){
+    return this.isDisabled;
   }
 
   getDetalleCotizacionToCreate(){
@@ -158,42 +204,23 @@ export class CotizacionService {
   }
 
   editarCotizacion() {
-    try {
-      const cotizacionEditada: Cotizacion = {
-        idCotizacion: this.cotizacionById!.idCotizacion,
-        idCliente: this.clienteSeleccionado !== undefined ? this.clienteSeleccionado : this.cotizacionById!.idCliente,
-        idUsuario: this.vendedorSeleccionado !== undefined ? this.vendedorSeleccionado : this.cotizacionById!.idUsuario,
-        nombre: this.nombreCotizacion !== undefined ? this.nombreCotizacion : this.cotizacionById!.nombre,
-        //Este editado por hay que colocar el usuario que está actualmente en la sesión
-        editadoPor: this.cotizacionById!.editadoPor,
-        descripcion: this.cotizacionById!.descripcion,
-        estado: this.estadoCotizacion !== undefined ? this.estadoCotizacion : this.cotizacionById!.estado,
-        expiracion: this.expirationDate !== undefined ? this.expirationDate : this.cotizacionById!.expiracion,
-        nombreCliente: this.cotizacionById!.nombreCliente,
-        emailCliente: this.cotizacionById!.emailCliente,
-        vendedor: this.cotizacionById!.vendedor,
-        valorIva: this.cotizacionById!.valorIva,
-        total: this.cotizacionById!.total,
-        createdAt: this.cotizacionById!.createdAt,
-        updatedAt: this.cotizacionById!.updatedAt,
-        numeroDocumento: this.cotizacionById!.numeroDocumento,
-        detalleCotizacions: this.cotizacionById!.detalleCotizacions,
-        idClienteNavigation: this.cotizacionById!.idClienteNavigation,
-        idUsuarioNavigation: this.cotizacionById!.idUsuarioNavigation
-      }
-      console.log(cotizacionEditada);
-      // if (!this.cotizacionById) return;
-      // return this.http.put<responseApi<Cotizacion>>(`${this.urlBase}/api/Cotizacion`, cotizacionEditada)
-      //   .pipe(
-      //     tap(cotizacionEditada => { console.log(cotizacionEditada); return this.cotizacionById = cotizacionEditada.value }),
-      //     catchError((e: any) => { console.error(e); return throwError(e) })
-      //   )
-    } catch (ex) {
-      return console.log(ex);
-    }
+      console.log(this.form!.value);
+      if (!this.cotizacionById) return;
+      return this.http.put<responseApi<Cotizacion>>(`${this.urlBase}/api/Cotizacion`, this.form!.value)
+        .pipe(
+          tap(cotizacionEditada => { console.log(cotizacionEditada); return this.cotizacionById = cotizacionEditada.value }),
+          catchError((e: any) => { console.error(e); return throwError(e) })
+        )
+
   }
 
+  updateForm(values: any) {
+    this.form?.patchValue(values);
+  }
 
+  setForm(form: FormGroup) {
+    this.formSubject.next(form);
+  }
 
   listarServicios(): Observable<responseApi<Servicio[]>> {
     return this.http.get<responseApi<Servicio[]>>(`${this.urlBase}/api/servicio`)

@@ -78,7 +78,7 @@
   height: 0;
   border-style: solid;
   border-width: 24px 0 24px 25px; /* Tamaño del triángulo */
-  border-color: transparent transparent transparent #B0B0B0; /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
+  border-color: transparent transparent transparent rgb(250 204 21); /* Color del triángulo (transparente en los tres lados y del mismo color que el fondo en el lado izquierdo) */
   z-index: 999;
 }
 
@@ -107,7 +107,7 @@
 }
 
 .active{
-  background-color: #b0b0b0;
+  background-color: rgb(250 204 21);
   color: white;
 }
 .activeAprove{

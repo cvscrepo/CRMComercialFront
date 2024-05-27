@@ -1,4 +1,5 @@
 
+
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Cotizacion } from '../../interfaces/cotizacion.interface';
 import { CotizacionService } from '../../services/cotizacion.service';
@@ -10,15 +11,17 @@ import { Cliente } from '../../interfaces/cliente.interface';
 import { ClienteService } from '../../services/cliente.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { Usuario } from '../../interfaces/usuario.interface';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
+import { MatFormFieldControl } from '@angular/material/form-field';
+import { validateHorizontalPosition } from '@angular/cdk/overlay';
 
 @Component({
   selector: 'crm-cotizacion-detail',
   templateUrl: './cotizacion-detail.component.html',
   styleUrl: './cotizacion-detail.component.css'
 })
-export class CotizacionDetailComponent implements OnInit {
+export class CotizacionDetailComponent implements OnInit, OnChanges {
 
   public idCotizacion: number = 0;
   @Input()
@@ -28,40 +31,19 @@ export class CotizacionDetailComponent implements OnInit {
   public detalleCotizacionList: DetalleCotizacion[] = [];
   private dataSubscription!: Subscription;
   private subscriptionDetail!:Subscription;
-  public columnsOfDetalleCotizacion:string[] = ['Servicio', 'Descripción', 'SUcursal', 'Cantidad', 'Subtotal', 'Eliminar'];
+  public columnsOfDetalleCotizacion:string[] = ['Servicio', 'Descripción', 'Sucursal', 'Cantidad', 'Subtotal', 'Eliminar'];
 
   public clienteList: Cliente[] = [];
   public usuarioList: Usuario[] = [];
-  public titleOfNewCotizacion: string = '';
-  //State by show select
-  public mostrarList: number = 0;
-
-  //Terms of search
-  public busquedaCliente: string = "";
-  public busquedaUsuario: string = "";
-
-  //States by edit cotización
-  public clienteSeleccionado: number = 0;
-  public usuarioSeleccionado: number = 0;
-  public expirationDate?: Date;
 
   //Nombre nueva cotizacion
   public nombreNewCotizacion: string = "";
 
 
+  public cotizacionID?:Cotizacion
 
-
-  public myForm: FormGroup = this.fb.group({
-    name: ['', [Validators.required]],
-    client: [0, [Validators.required]],
-    user: [0, [Validators.required]],
-    expirationDate: ['', [Validators.required]],
-    termOfSearchClient: [''],
-    termOfSearchUser: [''],
-    userList: this.fb.array([]),
-    clientList: this.fb.array([])
-  })
-
+  public myForm!: FormGroup;
+  public myFormStates!: FormGroup;
 
   constructor(
     private _cotizacionService: CotizacionService,
@@ -76,7 +58,6 @@ export class CotizacionDetailComponent implements OnInit {
       this.idCotizacionDetail = params.get('id');
       console.log('Id recibido desde la URL' + `${this.idCotizacionDetail}`)
       if (this.idCotizacionDetail !== null) {
-        this.detalleCotizacionList = [];
         this._cotizacionService.nuevaCotizacion = false;
         this.getCotizacionById(this.idCotizacionDetail);
         this.getDetalleCotizacion(this.idCotizacion);
@@ -88,11 +69,24 @@ export class CotizacionDetailComponent implements OnInit {
         this._cotizacionService.setNuevaCotizacion();
         this.listarVariablesEconomicas();
         this.listarServicios();
-
       }
     })
     this.getClienteList();
     this.getUserList();
+
+    this.myForm = this._cotizacionService.form!;
+    this.myFormStates = this._cotizacionService.myFormStates!;
+    if(!this.getDisabledState()){
+      this._cotizacionService.form!.disable();
+      this._cotizacionService.myFormStates!.disable();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    this.myForm.valueChanges.subscribe(value => {
+      this._cotizacionService.updateForm(value);
+    })
+
   }
 
   @ViewChild('selectContainer') selectContainer!: ElementRef;
@@ -100,26 +94,20 @@ export class CotizacionDetailComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   cerrarSelect(event: Event) {
     if (!this.selectContainer.nativeElement.contains(event.target)) {
-      this.mostrarList = 0;
+      this.myFormStates.controls['termOfSearchClient'].markAsUntouched();
+      this.myFormStates.controls['termOfSearchUser'].markAsUntouched();
     }
   }
 
   ngOnInit(): void {
     this.onTermsChanged();
-    console.log(this.fieldOfForm.value)
     if (this._cotizacionService.nuevaCotizacion) {
       this.dataSubscription = this._cotizacionService.detalleCotizacionOfNewCotizacion.subscribe(
         newData => {
-          console.log("OnInit", newData)
-          this.detalleCotizacionList = newData
+          this.detalleCotizacionList = newData;
           // Mandar una lista de objetos que haga match con la lista de columnas
         }
       )
-      // this.subscriptionDetail = this._cotizacionService.detalleCotizacionOfNewCotizacion.subscribe(
-      //   data => {
-      //     console.log('Detalle cotización de nueva cotización', data);
-      //   }
-      // )
     }
   }
 
@@ -131,20 +119,31 @@ export class CotizacionDetailComponent implements OnInit {
   // Agregar validaciones al los forms, al crear una nueva cotización
 
   isTouchedField(field: string): boolean | null {
-    return this.myForm.controls[field].touched;
+    return this.myFormStates.get(field)!.touched;
   }
 
   markAsTouched(field: string) {
-    return this.myForm.controls[field].markAsTouched();
+    return this.myFormStates.get(field)!.markAsTouched();
   }
 
-  get fieldOfForm() {
-    return this.myForm.controls['clientList'].value! as FormArray;
+  get fieldClientOfForm() {
+    return ;
   }
+
+
   onTermsChanged() {
     this.myForm.controls['termOfSearchClient'].valueChanges.pipe(
 
     )
+  }
+
+  stateChanged(event: number){
+    const estado = this._cotizacionService.form!.get('estado');
+    estado?.setValue(event);
+  }
+
+  get listClients() {
+    return this.myForm.get('clientList') as FormArray;
   }
 
   public changeNameCotizacion(){
@@ -158,10 +157,13 @@ export class CotizacionDetailComponent implements OnInit {
       nombreCompleto: [cliente.nombreCompleto, Validators.required],
       // Agrega aquí otros campos necesarios
     });
-    this.fieldOfForm.push(clientFormGroup);
+
   }
 
+  resetMyForm(cotizacion:Cotizacion){
+    this.myForm.reset(cotizacion);
 
+  }
 
   getCotizacionById(id: string | null) {
     if (id && id !== undefined) {
@@ -169,13 +171,13 @@ export class CotizacionDetailComponent implements OnInit {
       this._cotizacionService.setLoading();
       this._cotizacionService.getCotizacionById(this.idCotizacion).subscribe({
         next: (data: responseApi<Cotizacion>) => {
-          this.busquedaCliente = data.value.idClienteNavigation.nombreCompleto;
-          this.busquedaUsuario = data.value.idUsuarioNavigation.nombreCompleto;
-          this.clienteSeleccionado = data.value.idCliente;
-          this.usuarioSeleccionado = data.value.idUsuario;
+          // this.busquedaCliente = data.value.idClienteNavigation.nombreCompleto;
+          // this.busquedaUsuario = data.value.idUsuarioNavigation.nombreCompleto;
+
+          this.cotizacionID = data.value;
+          console.log(this.myForm.controls, "myform controls");
           this.listarSucursal(data.value.idCliente);
           this._cotizacionService.setLoading();
-          this.expirationDate = data.value.expiracion;
         },
         complete: () => {
         },
@@ -191,10 +193,7 @@ export class CotizacionDetailComponent implements OnInit {
       next: (data: responseApi<DetalleCotizacion[]>) => {
         if (data.success) {
           this.detalleCotizacionList = data.value;
-          console.log(this.detalleCotizacionList + "detalleCotizacionList");
         }
-      },
-      complete: () => {
       },
       error: (e) => {
         console.log(`Error ${e.message}`)
@@ -211,15 +210,11 @@ export class CotizacionDetailComponent implements OnInit {
   }
 
   public getClienteList() {
-
     if (this.clienteList.length === 0) {
       this.clienteSercive.getClientes().subscribe({
         next: (data: responseApi<Cliente[]>) => {
-          if (data.success) {
-            console.log(data.value);
-
-          }
-          this.clienteList = this.clienteSercive.clientes;
+          console.log(data.value, "clienteList");
+          this.clienteList = data.value;
         }
       })
     }
@@ -244,17 +239,7 @@ export class CotizacionDetailComponent implements OnInit {
   }
 
   public listarSucursal(idCliente: number) {
-    this._cotizacionService.listarSucursal(idCliente).subscribe({
-      next: (data) => {
-
-      },
-      complete: () => {
-
-      },
-      error: (err: any) => {
-        console.error(err);
-      }
-    })
+    this._cotizacionService.listarSucursal(idCliente).subscribe({})
   }
 
 
@@ -266,10 +251,6 @@ export class CotizacionDetailComponent implements OnInit {
     })
   }
 
-  public getVendedorList(): void {
-    this.mostrarList = 2;
-
-  }
 
   get cotizacionByIdValue() {
     return this._cotizacionService.cotizacionByIdValue;
@@ -278,38 +259,27 @@ export class CotizacionDetailComponent implements OnInit {
   public seleccionarCampo(choose: boolean): string | undefined {
 
     if (choose) {
-      this._cotizacionService.clienteSeleccionado = this.clienteSeleccionado;
-      console.log('Cliente seleccionado: ', this.clienteSeleccionado);
-      const clienteEncontrado = this.clienteList.find(cliente => cliente.idCliente == this.clienteSeleccionado);
-      console.log(this.clienteList);
-      console.log(clienteEncontrado);
-      this.listarSucursal(this.clienteSeleccionado);
+      const clienteEncontrado = this.clienteList.find(cliente => cliente.idCliente == this.myForm.controls['idCliente'].value);
+      this.listarSucursal(this.myForm.controls['idCliente'].value);
       if (clienteEncontrado) {
-        this.busquedaCliente = clienteEncontrado.nombreCompleto
-        console.log(this.busquedaCliente);
+        console.log("hello")
+        this.myFormStates.controls['termOfSearchClient'].setValue(clienteEncontrado.nombreCompleto);
+        console.log(this.myForm);
+        this.myFormStates.controls['termOfSearchClient'].markAsUntouched();
       }
     } else {
-      this._cotizacionService.vendedorSeleccionado = this.usuarioSeleccionado;
-      console.log('Usuario seleccionado: ', this.usuarioSeleccionado);
       this.usuarioList.forEach(usuario => {
-        if (usuario.idUsuario == this.usuarioSeleccionado) {
-          this.busquedaUsuario = usuario.nombreCompleto
+        if (usuario.idUsuario == this.myForm.controls['idUsuario'].value) {
+          // this.busquedaUsuario = usuario.nombreCompleto
+          this.myFormStates.controls['termOfSearchUser'].setValue(usuario.nombreCompleto);
         }
+        console.log('no entra')
       });
+      this.myFormStates.controls['termOfSearchUser'].markAsUntouched();
     }
-    this.mostrarList = 0;
+
     return;
-  }
-
-  estadoChanged(state: number) {
-    this._cotizacionService.estadoCotizacion = state;
-    console.log(`Estado cambiado ${state}`);
-  }
-
-  onFechaSeleccionada() {
-    this._cotizacionService.expirationDate = this.expirationDate;
-    console.log("Se ha seleccionado la fecha:", this.expirationDate);
-  }
+  };
 
   getLoading(): boolean {
     return this._cotizacionService.loading;

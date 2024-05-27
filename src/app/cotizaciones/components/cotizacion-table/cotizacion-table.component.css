@@ -25,15 +25,15 @@
 }
 
 .rows{
-  height: 10px;
+  height: 40px;
   font-size: small;
   color: #777777;
   background-color: #f8f8f869;
 }
 
 .rows2{
-  height: 7px;
-  font-size: 11px;
+  height: 40px;
+  font-size: small;
   color: #777777;
   background-color: #f8f8f869;
 }

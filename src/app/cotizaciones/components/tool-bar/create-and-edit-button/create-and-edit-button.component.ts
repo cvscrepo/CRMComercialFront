@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CotizacionService } from '../../../services/cotizacion.service';
 import { responseApi } from '../../../../shared/interfaces/response.interface';
 import { Cotizacion } from '../../../interfaces/cotizacion.interface';
@@ -14,6 +14,8 @@ export class CreateAndEditButtonComponent {
 
   @Input()
   public newCotizacionObjetc?:Cotizacion;
+
+  @Output() saveCotizacion = new EventEmitter<Cotizacion>();
   constructor(private cotizacionService:CotizacionService){
 
   }
@@ -29,12 +31,26 @@ export class CreateAndEditButtonComponent {
       this.cotizacionService.guardarCotizacion();
       this.cotizacionService.setLoading();
     }else{
-      this.cotizacionService.editarCotizacion();
+      console.log("Estamos editando la cotización");
+      console.log(this.cotizacionService.form);
+      this.cotizacionService.editarCotizacion()?.subscribe({
+        next: (data)=>{
+          this.cotizacionService.setLoading();
+          this.discartChanges();
+        },
+        error: (e)=>{
+          console.error(e);
+          this.cotizacionService.setLoading();
+
+        }
+      });
     }
   }
 
   public editCotizacion(){
     this.cotizacionService.setEditMode();
+    this.cotizacionService.form!.enable();
+    this.cotizacionService.myFormStates!.enable();
     this.typeButtons = 3;
   }
 

@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DetailCotizacionComponent } from '../../detail-cotizacion/detail-cotizacion.component';
 import { DetalleCotizacionService } from '../../../services/detalleCotizacion.service';
 import { UtilidadService } from '../../../../shared/services/utilidad.service';
+import { FormArray } from '@angular/forms';
 
 @Component({
   selector: 'crm-lista-detalle-cotizacion',
@@ -14,7 +15,7 @@ import { UtilidadService } from '../../../../shared/services/utilidad.service';
 })
 export class ListaDetalleCotizacionComponent implements OnChanges, OnInit{
   @Input()
-  public dataList:any[]=[];
+  public dataList:DetalleCotizacion[]=[];
   @Input()
   public displayedColumns: string[] = [];
 
@@ -38,6 +39,7 @@ export class ListaDetalleCotizacionComponent implements OnChanges, OnInit{
       //   console.log("lista")
       //   console.log(this.dataSource);
       // })
+
     }
 
   }

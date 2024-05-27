@@ -20,6 +20,7 @@ export interface Cotizacion {
   createdAt:           Date ;
   updatedAt:           Date ;
   expiracion:          Date;
+  comentarios:         string;
   numeroDocumento:     number;
   detalleCotizacions:  DetalleCotizacion[];
   idClienteNavigation: Cliente;

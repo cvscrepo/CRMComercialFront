@@ -8,13 +8,13 @@ import { Router, UrlHandlingStrategy } from '@angular/router';
   templateUrl: './tool-bar.component.html',
   styleUrl: './tool-bar.component.css'
 })
-export class ToolBarComponent implements AfterViewInit, OnInit {
+export class ToolBarComponent implements AfterViewChecked, OnInit {
 
   //if the number type is 0, its the desault type, 1 detail type
   @Input()
   public type: number = 1;
 
-  public title: string = "Cotizaciones";
+  public title: string = "";
 
   @Output()
   public termBusqueda:EventEmitter<string>= new EventEmitter<string>();
@@ -22,28 +22,26 @@ export class ToolBarComponent implements AfterViewInit, OnInit {
   constructor(
     private servicioCotizaciones : CotizacionService,
     private route : Router
-  ){
-  }
+  ){}
 
   ngOnInit(): void {
-    this.servicioCotizaciones.cotizacionByIdSubject.subscribe(c => {
-      if(c){
-        this.title = c.nombre;
-      }
-    })
+    if(!this.servicioCotizaciones.disabledState){
+      this.servicioCotizaciones.form?.disable();
+    }
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewChecked(): void {
     if(this.route.url === "/cotizacion/list"){
-      this.title = "Cotizaciones";
+      this.title = "Lista de cotizaciones";
     }
     if(this.servicioCotizaciones.cotizacionById?.nombre){
-      this.title = this.servicioCotizaciones.cotizacionById.nombre;
+      this.title = this.servicioCotizaciones.form!.get('nombre')?.value;
     }
   }
 
   setearNombre(){
-    this.servicioCotizaciones.nombreCotizacion = this.title
+    const titleOfCotizacion = this.servicioCotizaciones.form?.get('nombre');
+    titleOfCotizacion?.setValue(this.title);
   }
 
   recibirValores(valor:string):void{

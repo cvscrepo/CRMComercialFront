@@ -19,7 +19,7 @@ import { CotizacionStateComponent } from './components/cotizacion-state/cotizaci
 import { HorizontalMenuComponent } from './components/horizontal-menu/horizontal-menu.component';
 import { ListaDetalleCotizacionComponent } from './components/cotizacion-detail/lista-detalle-cotizacion/lista-detalle-cotizacion.component';
 import { LateralListComponent } from './components/cotizacion-detail/lateral-list/lateral-list.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FilterCotizacionPipe } from './pipes/filter-cotizacion.pipe';
 import { LoadingComponent } from './components/loading/loading.component';
 import { DetailCotizacionComponent } from './components/detail-cotizacion/detail-cotizacion.component';

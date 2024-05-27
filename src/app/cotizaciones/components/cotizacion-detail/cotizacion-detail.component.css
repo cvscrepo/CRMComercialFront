@@ -4,4 +4,55 @@
   /* Agrega otros estilos según tus preferencias */
 }
 
+.custom-input-container {
+  position: relative;
+  margin: 16px 0;
+  font-family: Roboto, sans-serif;
+}
 
+.custom-input-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: rgba(0, 0, 0, 0.6);
+  transform: translateY(24px);
+  transition: transform 0.2s ease, color 0.2s ease;
+  pointer-events: none;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 16px;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+  background: transparent;
+  outline: none;
+  color: rgba(0, 0, 0, 0.87);
+  transition: border-bottom-color 0.2s ease;
+}
+
+.custom-input:focus {
+  border-bottom: 2px solid #3f51b5; /* Color de enfoque */
+}
+
+.custom-input:focus + .custom-input-label,
+.custom-input:not(:placeholder-shown) + .custom-input-label {
+  transform: translateY(-7spx);
+  color: #3f51b5; /* Color de enfoque */
+}
+
+.custom-input-underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #3f51b5; /* Color de la línea inferior */
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.custom-input:focus ~ .custom-input-underline {
+  transform: scaleX(1);
+}
