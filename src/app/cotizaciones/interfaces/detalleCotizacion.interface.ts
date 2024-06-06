@@ -38,4 +38,13 @@ export interface VariablesEconomicasNavigation {
   updatedAt:             null;
 }
 
-
+export enum DiasDeLaSemana{
+  Lunes = "Lunes",
+  Martes = "Martes",
+  Miercoles = "Miercoles",
+  Jueves = "Jueves",
+  Viernes = "Viernes",
+  Sabado = "Sabado",
+  Domingo = "Domingo",
+  Festivo = "Festivo"
+}

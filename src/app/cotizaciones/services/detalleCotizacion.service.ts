@@ -6,7 +6,7 @@ import { responseApi } from '../../shared/interfaces/response.interface';
 import { DetalleCotizacion } from '../interfaces/detalleCotizacion.interface';
 import { UtilidadService } from '../../shared/services/utilidad.service';
 import { CotizacionService } from './cotizacion.service';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Injectable({ providedIn: 'root' })
 export class DetalleCotizacionService {
@@ -29,9 +29,17 @@ export class DetalleCotizacionService {
       .pipe(
         tap(detalleCotizacion => {
           console.log(detalleCotizacion.value, "Detalle Cotizacion");
+
+          let detalleCotizacionArray = this._cotizacionService.form?.get('detalleCotizacions') as FormArray;
+
+          // Limpiar el FormArray antes de agregar nuevos elementos
+          while (detalleCotizacionArray.length) {
+            detalleCotizacionArray.removeAt(0);
+          }
+
           for (const detalleCotizacio of detalleCotizacion.value) {
             console.log("detalleCotizacionnn", detalleCotizacion);
-            const detalleCotizacionArray = this._cotizacionService.form?.get('detalleCotizacions') as FormArray;
+
             const detalleCotizacionFormGroup = this.fb.group({
               idDetalleCotizacion: [detalleCotizacio.idDetalleCotizacion, Validators.required],
               idServicio: [detalleCotizacio.idServicio , Validators.required],
@@ -44,12 +52,13 @@ export class DetalleCotizacionService {
               idServicioNavigation: [detalleCotizacio.idServicioNavigation, Validators.required],
               idSucursalNavigation: [detalleCotizacio.idSucursalNavigation, Validators.required],
             });
-            detalleCotizacionArray.push(detalleCotizacionFormGroup);
 
+            detalleCotizacionArray.push(detalleCotizacionFormGroup);
           }
-          return this.detalleCotizacion = detalleCotizacion.value
+
+          return this.detalleCotizacion = detalleCotizacion.value;
         }),
-        catchError((e: any) => { console.error(e); return throwError(e) })
+        catchError((e: any) => { console.error(e); return throwError(e); })
       );
   }
 
@@ -69,8 +78,8 @@ export class DetalleCotizacionService {
       )
   }
 
-  deleteDetalleCotizacion(detalle: DetalleCotizacion): Observable<responseApi<boolean>> {
-    return this.http.delete<responseApi<boolean>>(`${this.urlBase}/api/DetalleCotizacion?id=${detalle.idDetalleCotizacion}`)
+  deleteDetalleCotizacion(idDetllaeCotizacion: number): Observable<responseApi<boolean>> {
+    return this.http.delete<responseApi<boolean>>(`${this.urlBase}/api/DetalleCotizacion?id=${idDetllaeCotizacion}`)
       .pipe(
         tap(data => {
           console.log(data);

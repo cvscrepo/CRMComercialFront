@@ -13,7 +13,7 @@ import { FormArray } from '@angular/forms';
   templateUrl: './lista-detalle-cotizacion.component.html',
   styleUrl: './lista-detalle-cotizacion.component.css'
 })
-export class ListaDetalleCotizacionComponent implements OnChanges, OnInit{
+export class ListaDetalleCotizacionComponent implements OnInit{
   @Input()
   public dataList:DetalleCotizacion[]=[];
   @Input()
@@ -31,26 +31,18 @@ export class ListaDetalleCotizacionComponent implements OnChanges, OnInit{
   }
 
   ngOnInit(): void {
-    if(this.cotizacionService.nuevaCotizacion){
-
-      // this.subscription = this.cotizacionService.detalleCotizacionOfNewCotizacion.subscribe( data => {
-      //   this.detalleCotizacionList = data
-      //   this.dataSource = this.detalleCotizacionList;
-      //   console.log("lista")
-      //   console.log(this.dataSource);
-      // })
-
-    }
-
+    this.cotizacionService.form?.get("detalleCotizacions")?.valueChanges.subscribe(data => {
+      this.dataSource = [...data];
+    })
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  // ngOnChanges(changes: SimpleChanges): void {
 
-    this.dataSource = changes['dataList'].currentValue;
-    console.log(this.dataSource);
-    console.log("Change")
+  //   this.dataSource = changes['dataList'].currentValue;
+  //   console.log(this.dataSource);
+  //   console.log("Change")
 
-  }
+  // }
 
   public getDisabledState(){
     return this.cotizacionService.isDisabled;
@@ -70,7 +62,7 @@ export class ListaDetalleCotizacionComponent implements OnChanges, OnInit{
       this.cotizacionService.setLoading();
       return;
     }
-    this.detalleCotizacionService.deleteDetalleCotizacion(detail).subscribe({
+    this.detalleCotizacionService.deleteDetalleCotizacion(detail.idDetalleCotizacion).subscribe({
       next: (data)=>{ this.utilidadService.mostrarAlerta("Detalle cotización eliminado con éxito", ":(", "bottom", "center");},
       complete: ()=> {this.cotizacionService.setLoading();},
       error: ()=> {this.utilidadService.mostrarAlerta("Detalle cotización no pudo ser eliminado", "Error!!!", "bottom", "center"); this.cotizacionService.setLoading()}
