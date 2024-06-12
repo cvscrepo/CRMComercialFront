@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DetailCotizacionComponent } from '../../detail-cotizacion/detail-cotizacion.component';
 import { CotizacionService } from '../../../services/cotizacion.service';
@@ -9,12 +9,12 @@ import { CotizacionService } from '../../../services/cotizacion.service';
   styleUrl: './button-add-detail.component.css'
 })
 export class ButtonAddDetailComponent {
-
+  @Input()
+  public incompleteInfo: boolean = false;
   constructor(
     private dialog : MatDialog,
     private cotizacionService: CotizacionService
   ){
-
   }
 
   get disabledState(){

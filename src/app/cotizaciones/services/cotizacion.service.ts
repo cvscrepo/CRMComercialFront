@@ -1,18 +1,15 @@
-import { Usuario } from './../interfaces/usuario.interface';
-import { Cliente } from './../interfaces/cliente.interface';
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { environments } from '../../../environments/environments.prod';
 import { HttpClient } from '@angular/common/http';
 import { Cotizacion, CotizacionDTO } from '../interfaces/cotizacion.interface';
 import { BehaviorSubject, Observable, Subject, catchError, pipe, tap, throwError } from 'rxjs';
-import { coerceArray } from '@angular/cdk/coercion';
 import { responseApi } from '../../shared/interfaces/response.interface';
-import { JsonPipe } from '@angular/common';
-import { DetalleCotizacion, DetalleCotizacionVariable, VariablesEconomicasNavigation } from '../interfaces/detalleCotizacion.interface';
+import { DetalleCotizacion, VariablesEconomicasNavigation } from '../interfaces/detalleCotizacion.interface';
 import { Servicio } from '../interfaces/servicio.interface';
 import { Sucursal } from '../interfaces/sucursal.interface';
 import { Route, Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TokenType } from '@angular/compiler';
 
 @Injectable({ providedIn: 'root' })
 export class CotizacionService {
@@ -45,10 +42,10 @@ export class CotizacionService {
   public nuevaCotizacion: boolean = false;
   public menuProfile: boolean = false;
 
-  //DetalleCotizacion
-  private detalleCotizacionToCreate = new BehaviorSubject<DetalleCotizacion[]>([]);
-  data$ = this.detalleCotizacionToCreate.asObservable();
+  //Valores de cotización
+  public subtotal: number = 0;
 
+  //Estados de busqueda de cotización
   private formSubject = new BehaviorSubject<FormGroup | undefined>(undefined);
   private formStatesSubject = new BehaviorSubject<FormGroup | undefined>(undefined);
 
@@ -60,12 +57,6 @@ export class CotizacionService {
     this.initForm();
   }
 
-
-  // Se necesita el get all de cotización
-  // Se necesita el get id de cotización
-  //
-
-
   private initForm() {
     const form = this.fb.group({
       idCotizacion: [0, [Validators.required]],
@@ -75,14 +66,16 @@ export class CotizacionService {
       expiracion: ['', [Validators.required]],
       descripcion: [''],
       comentarios: [''],
-      estado: [0, [Validators.required]],
-      detalleCotizacions: this.fb.array([])
+      estado: [2, [Validators.required]],
+      detalleCotizacions: this.fb.array([]),
+      total : [0, [Validators.required]],
+      valorIva : [0, [Validators.required]],
 
     });
     this.formSubject.next(form);
     const myStates = this.fb.group({
-      termOfSearchClient: [''],
-      termOfSearchUser: ['']
+      termOfSearchClient: ['', [Validators.required]],
+      termOfSearchUser: ['', [Validators.required]]
     });
     this.formStatesSubject.next(myStates);
   }
@@ -109,7 +102,7 @@ export class CotizacionService {
         tap(cotizacion => {
           this.cotizacionById = cotizacion.value;
           this.form?.patchValue(cotizacion.value);
-
+          console.log(cotizacion.value, "Cotizacion");
           //DetalleCotizacion to form group
           const detalleCotizacionArray = this.form?.get('detalleCotizacions') as FormArray;
           const termOfSearchClient = this.myFormStates!.controls['termOfSearchClient'];
@@ -136,9 +129,7 @@ export class CotizacionService {
     )
   }
 
-  get detalleCotizacionOfNewCotizacion(){
-    return this.detalleCotizacionToCreate;
-  }
+
 
   get cotizacionByIdValue(){
     return this.cotizacionById;
@@ -148,15 +139,6 @@ export class CotizacionService {
     return this.isDisabled;
   }
 
-  getDetalleCotizacionToCreate(){
-    return this.detalleCotizacionToCreate.getValue();
-  }
-
-  addData(newDetalle: DetalleCotizacion){
-    const currentData = this.detalleCotizacionToCreate.getValue();
-    currentData.push(newDetalle);
-    this.detalleCotizacionToCreate.next(currentData);
-  }
 
   setLoading(): void {
     this.loading = !this.loading;
@@ -182,14 +164,14 @@ export class CotizacionService {
     console.log(this.expirationDate);
     const cotizacionACrear: CotizacionDTO = {
       idCotizacion: 0,
-      idCliente: this.clienteSeleccionado!,
-      idUsuario: this.vendedorSeleccionado!,
-      nombre: this.nombreCotizacion!,
+      idCliente: this.form?.get('idCliente')?.value,
+      idUsuario: this.form?.get('idUsuario')?.value,
+      nombre: this.form?.get('nombre')?.value,
       //Este editado por hay que colocar el usuario que está actualmente en la sesión
-      descripcion: '',
-      estado: 2,
+      descripcion: this.form?.get('descripcion')?.value,
+      estado: this.form?.get('estado')?.value,
       total: 0,
-      detalleCotizacions: this.detalleCotizacionOfNewCotizacion.value
+      detalleCotizacions: this.form?.get('detalleCotizacions')?.value
     }
     console.log(cotizacionACrear);
     this.saveEntireCotizacion(cotizacionACrear).subscribe({
@@ -211,7 +193,6 @@ export class CotizacionService {
           tap(cotizacionEditada => { console.log(cotizacionEditada); return this.cotizacionById = cotizacionEditada.value }),
           catchError((e: any) => { console.error(e); return throwError(e) })
         )
-
   }
 
   updateForm(values: any) {
@@ -220,6 +201,13 @@ export class CotizacionService {
 
   setForm(form: FormGroup) {
     this.formSubject.next(form);
+  }
+
+  resetForm(){
+    this.form?.reset();
+    // let detalles = this.form?.get('detalleCotizacions') as FormArray;
+    // detalles?.setValue([]);
+    this.myFormStates?.reset();
   }
 
   listarServicios(): Observable<responseApi<Servicio[]>> {
@@ -237,7 +225,7 @@ export class CotizacionService {
   listarSucursal(idCliente: number): Observable<responseApi<Sucursal[]>> {
     return this.http.get<responseApi<Sucursal[]>>(`${this.urlBase}/api/Sucursal/id?id=${idCliente}`)
       .pipe(
-        tap(data => { console.log(data.value); this.listaSucursal = data.value }),
+        tap(data => { console.log(data.value); this.listaSucursal = [...data.value] }),
         catchError((e: any) => { console.error(e.message); return throwError(e) })
       )
   }

@@ -15,6 +15,7 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { Subscription } from 'rxjs';
 import { MatFormFieldControl } from '@angular/material/form-field';
 import { validateHorizontalPosition } from '@angular/cdk/overlay';
+import { ListaDetalleCotizacion } from '../../interfaces/listaDetalleCotizacion';
 
 @Component({
   selector: 'crm-cotizacion-detail',
@@ -28,7 +29,7 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
   public idCotizacionDetail: string | null = null;
 
   //DetalleCotizacion
-  public detalleCotizacionList: DetalleCotizacion[] = [];
+  public detalleCotizacionList: ListaDetalleCotizacion[] = [];
   private dataSubscription!: Subscription;
   private subscriptionDetail!:Subscription;
   public columnsOfDetalleCotizacion:string[] = ['Servicio', 'Descripción', 'Sucursal', 'Cantidad', 'Subtotal', 'Eliminar'];
@@ -39,11 +40,11 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
   //Nombre nueva cotizacion
   public nombreNewCotizacion: string = "";
 
-
   public cotizacionID?:Cotizacion
 
   public myForm!: FormGroup;
   public myFormStates!: FormGroup;
+
 
   constructor(
     private _cotizacionService: CotizacionService,
@@ -63,29 +64,52 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
         this.getDetalleCotizacion(this.idCotizacion);
         this.listarVariablesEconomicas();
         this.listarServicios();
-
       } else {
-        this._cotizacionService.setEditMode()
+
+        this._cotizacionService.isDisabled = true;
+        this._cotizacionService.resetForm();
         this._cotizacionService.setNuevaCotizacion();
         this.listarVariablesEconomicas();
         this.listarServicios();
       }
     })
+    this.myForm = this._cotizacionService.form!;
+    this.myFormStates = this._cotizacionService.myFormStates!;
     this.getClienteList();
     this.getUserList();
 
-    this.myForm = this._cotizacionService.form!;
-    this.myFormStates = this._cotizacionService.myFormStates!;
-    if(!this.getDisabledState()){
+    if(!this._cotizacionService.nuevaCotizacion){
       this._cotizacionService.form!.disable();
       this._cotizacionService.myFormStates!.disable();
+    }else{
+
+      this._cotizacionService.form!.enable();
+      this._cotizacionService.myFormStates!.enable();
     }
+
+  }
+
+  ngOnInit(): void {
+    if (this._cotizacionService.nuevaCotizacion) {
+      // this.dataSubscription = this._cotizacionService.detalleCotizacionOfNewCotizacion.subscribe(
+      //   newData => {
+      //     this.detalleCotizacionList = newData;
+      //     // Mandar una lista de objetos que haga match con la lista de columnas
+      //   }
+      // )
+    }
+    this._cotizacionService.form?.get('detalleCotizacions')?.valueChanges.subscribe(data => {
+      console.log(data);
+      this.detalleCotizacionList = data;
+    })
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
     this.myForm.valueChanges.subscribe(value => {
       this._cotizacionService.updateForm(value);
     })
+
 
   }
 
@@ -98,19 +122,6 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
       this.myFormStates.controls['termOfSearchUser'].markAsUntouched();
     }
   }
-
-  ngOnInit(): void {
-    this.onTermsChanged();
-    if (this._cotizacionService.nuevaCotizacion) {
-      this.dataSubscription = this._cotizacionService.detalleCotizacionOfNewCotizacion.subscribe(
-        newData => {
-          this.detalleCotizacionList = newData;
-          // Mandar una lista de objetos que haga match con la lista de columnas
-        }
-      )
-    }
-  }
-
 
 
   //Tareas pendientes
@@ -130,11 +141,21 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
     return ;
   }
 
+  detalleCotizacionsToList(detalleCotizacionList: DetalleCotizacion[]): ListaDetalleCotizacion[] {
 
-  onTermsChanged() {
-    this.myForm.controls['termOfSearchClient'].valueChanges.pipe(
+    return detalleCotizacionList.map(detalle => {
+      return {
+        Servicio: detalle.idServicioNavigation.nombre,
+        Descripcion: detalle.detalleServicio,
+        Sucursal: detalle.idSucursalNavigation.nombre,
+        Cantidad: detalle.cantidadServicios,
+        Subtotal: detalle.total
+      }
+    })
+  }
 
-    )
+  statusMyFormState():boolean {
+   return this.myFormStates.status === 'INVALID';
   }
 
   stateChanged(event: number){
@@ -175,7 +196,6 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
           // this.busquedaUsuario = data.value.idUsuarioNavigation.nombreCompleto;
 
           this.cotizacionID = data.value;
-          console.log(this.myForm.controls, "myform controls");
           this.listarSucursal(data.value.idCliente);
           this._cotizacionService.setLoading();
         },
@@ -192,7 +212,7 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
     this.detalleService.getDetalleCotizacionByIdCotizacion(id).subscribe({
       next: (data: responseApi<DetalleCotizacion[]>) => {
         if (data.success) {
-          this.detalleCotizacionList = data.value;
+
         }
       },
       error: (e) => {
@@ -239,7 +259,10 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
   }
 
   public listarSucursal(idCliente: number) {
-    this._cotizacionService.listarSucursal(idCliente).subscribe({})
+    this._cotizacionService.listarSucursal(idCliente).subscribe({
+      next: (data) => { console.log(data.value); },
+      error: (e) => { console.error(e); }
+    })
   }
 
 
@@ -253,7 +276,7 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
 
 
   get cotizacionByIdValue() {
-    return this._cotizacionService.cotizacionByIdValue;
+    return this._cotizacionService.cotizacionByIdValue ;
   }
 
   public seleccionarCampo(choose: boolean): string | undefined {
@@ -286,5 +309,16 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
   }
 
 
+  get subtotal(): number {
+    return this._cotizacionService.form?.value.detalleCotizacions?.reduce((acc: number, element:DetalleCotizacion) => acc + element.total, 0) || 0;
+  }
+
+  get valorIva(): number {
+    return this._cotizacionService.form?.get('valorIva')?.value || 0;
+  }
+
+  get valorTotal(): number {
+    return this._cotizacionService.form?.get('total')?.value || 0;
+  }
 }
 

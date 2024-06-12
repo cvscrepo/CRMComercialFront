@@ -15,7 +15,7 @@ import { FormArray } from '@angular/forms';
 })
 export class ListaDetalleCotizacionComponent implements OnInit{
   @Input()
-  public dataList:DetalleCotizacion[]=[];
+  public dataList:any[]=[];
   @Input()
   public displayedColumns: string[] = [];
 
@@ -31,18 +31,26 @@ export class ListaDetalleCotizacionComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.cotizacionService.form?.get("detalleCotizacions")?.valueChanges.subscribe(data => {
-      this.dataSource = [...data];
-    })
+    // this.cotizacionService.form?.get("detalleCotizacions")?.valueChanges.subscribe(data => {
+    //   this.dataSource = this.dataList;
+    // })
+    console.log("Lista de detalles");
+    console.log(this.dataList);
+    if(this.dataList.length === 0){
+      this.dataSource = this.dataList;
+    }else{
+      this.dataSource = [...this.dataList];
+    }
   }
 
-  // ngOnChanges(changes: SimpleChanges): void {
 
-  //   this.dataSource = changes['dataList'].currentValue;
-  //   console.log(this.dataSource);
-  //   console.log("Change")
+  ngOnChanges(changes: SimpleChanges): void {
 
-  // }
+    this.dataSource = changes['dataList'].currentValue;
+    console.log(this.dataSource);
+    console.log("Change")
+
+  }
 
   public getDisabledState(){
     return this.cotizacionService.isDisabled;
@@ -50,15 +58,15 @@ export class ListaDetalleCotizacionComponent implements OnInit{
 
   onSelectDetail(detalle :DetalleCotizacion, index : number):void{
     const dialogRef = this.dialog.open(DetailCotizacionComponent, {
-      data : {detalle, editMode: this.getDisabledState(), index }
+      data : {detalle, editMode: this.getDisabledState(), newDetail: false, index }
     });
   }
 
   onDeleteDetailCotizacion(detail : DetalleCotizacion, index: number){
     this.cotizacionService.setLoading();
     if(this.cotizacionService.nuevaCotizacion){
-      const listaCotizacion = this.cotizacionService.getDetalleCotizacionToCreate();
-      listaCotizacion.splice(index, 1);
+      // const listaCotizacion = this.cotizacionService.getDetalleCotizacionToCreate();
+      // listaCotizacion.splice(index, 1);
       this.cotizacionService.setLoading();
       return;
     }

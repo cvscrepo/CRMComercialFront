@@ -82,7 +82,12 @@ export class DetalleCotizacionService {
     return this.http.delete<responseApi<boolean>>(`${this.urlBase}/api/DetalleCotizacion?id=${idDetllaeCotizacion}`)
       .pipe(
         tap(data => {
-          console.log(data);
+          const listadetalle = this._cotizacionService.form?.get('detalleCotizacions') as FormArray;
+          listadetalle.value.foreach((element:DetalleCotizacion , index:number) => {
+            if (element.idDetalleCotizacion === idDetllaeCotizacion) {
+              listadetalle.removeAt(index);
+            }
+          });
         }),
 
       )

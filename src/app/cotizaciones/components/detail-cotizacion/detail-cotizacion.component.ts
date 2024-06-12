@@ -52,6 +52,8 @@ export class DetailCotizacionComponent implements OnInit {
   ) {
     this.editMode = this.data.editMode;
     this.listaSucursales = this.cotizacionService.listaSucursal;
+    console.log("Sucursales");
+    console.log(this.listaSucursales);
     this.listaServicios = this.cotizacionService.listaServicios;
     this.detalleCotizacionForm = this.formBiulder.group({
       idDetalleCotizacion: [0],
@@ -89,15 +91,15 @@ export class DetailCotizacionComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  isValidField(field: string):boolean|null{
+  isValidField(field: string): boolean | null {
     return this.valorDiasSelect.controls[field].errors ? true : false;
   }
 
-  isRequiredField(field: string):boolean|null{
+  isRequiredField(field: string): boolean | null {
     return this.valorDiasSelect.controls[field].valid ? true : false;
   }
 
-  isOutOfRange(field: string):boolean|null{
+  isOutOfRange(field: string): boolean | null {
     return this.valorDiasSelect.controls[field].errors ? true : false;
   }
 
@@ -155,7 +157,7 @@ export class DetailCotizacionComponent implements OnInit {
 
   valueDayChange(event: any) {
     //Solo ejecutar si el valor estpa en el rango 0-5
-    if(event.target.value && event.target.value < 5 && event.target.value > 0){
+    if (event.target.value && event.target.value < 5 && event.target.value > 0) {
       this.detalleCotizacionForm.value.detalleCotizacionVariables.forEach((detalle: any) => {
         if (detalle.idVariablesEconomicasNavigation.nombre === event.target.name) {
           detalle.valor = event.target.value;
@@ -178,8 +180,8 @@ export class DetailCotizacionComponent implements OnInit {
       minutosInicioServicio: '',
       minutosFinServicio: ''
     });
-    this.listaServicios.unshift(this.data.detalle.idServicioNavigation);
-    this.listaSucursales?.unshift(this.data.detalle.idSucursalNavigation);
+    // this.listaServicios.unshift(this.data.detalle.idServicioNavigation);
+    // this.listaSucursales?.unshift(this.data.detalle.idSucursalNavigation);
     console.log(this.data.detalle.detalleCotizacionVariables)
     this.data.detalle.detalleCotizacionVariables.forEach(v => {
       var formatoHora = "";
@@ -255,8 +257,8 @@ export class DetailCotizacionComponent implements OnInit {
     if (diasRequeridos) {
       diasRequeridos.valor = counter.toString();
     } else {
-      this.detalleCotizacionForm.value.detalleCotizacionVariables.forEach((element:any) => {
-        if(this.diasDeLaSemana.includes(element.idVariablesEconomicasNavigation.nombre)){
+      this.detalleCotizacionForm.value.detalleCotizacionVariables.forEach((element: any) => {
+        if (this.diasDeLaSemana.includes(element.idVariablesEconomicasNavigation.nombre)) {
           counter += parseInt(element.valor);
         }
       });
@@ -283,8 +285,8 @@ export class DetailCotizacionComponent implements OnInit {
     console.log(1);
     let variableEconomicaA = this.cotizacionService.listaVariablesEconomicas.find(v => v.nombre === "armado");
     let variableEconomicaS = this.cotizacionService.listaVariablesEconomicas.find(v => v.nombre === "SMLV");
-    let econtradoA = this.detalleCotizacionForm.value.detalleCotizacionVariables .some((v:any) => v.idVariablesEconomicasNavigation.nombre === "armado");
-    let econtradoS = this.detalleCotizacionForm.value.detalleCotizacionVariables.some((v:any) => v.idVariablesEconomicasNavigation.nombre === "SMLV");
+    let econtradoA = this.detalleCotizacionForm.value.detalleCotizacionVariables.some((v: any) => v.idVariablesEconomicasNavigation.nombre === "armado");
+    let econtradoS = this.detalleCotizacionForm.value.detalleCotizacionVariables.some((v: any) => v.idVariablesEconomicasNavigation.nombre === "SMLV");
     if (econtradoA) {
       this.detalleCotizacionForm.value.detalleCotizacionVariables.forEach((detalle: any) => {
         if (detalle.idVariablesEconomicasNavigation.nombre === "armado") {
@@ -326,27 +328,52 @@ export class DetailCotizacionComponent implements OnInit {
     // this.detalleCotizacionForm.value.detalleCotizacionVariables = listaEditada;
     if (this.data.newDetail) {
       console.log(this.cotizacionService.nuevaCotizacion)
-      if (this.cotizacionService.nuevaCotizacion) {
+      if (!this.cotizacionService.nuevaCotizacion) {
         const sucursalFound = this.listaSucursales.find(s => s.idSucursal === this.detalleCotizacionForm.value.idSucursal);
         const servicioFuond = this.listaServicios.find(s => s.idServicio === this.detalleCotizacionForm.value.idServicio);
-        this.detalleCotizacionForm.value.idSucursalNavigation = sucursalFound;
-        this.detalleCotizacionForm.value.idServicioNavigation = servicioFuond;
-        this.detalleCotizacionForm.value.detalleCotizacionInventarios = [];
+        this.detalleCotizacionForm.get('idSucursalNavigation')?.setValue(sucursalFound);
+        this.detalleCotizacionForm.get('idServicioNavigation')?.setValue(servicioFuond);
+        this.detalleCotizacionForm.get('detalleCotizacionInventarios')?.setValue([]);
+        let idCotizacion = this.detalleCotizacionForm.get('idCotizacion')?.setValue(this.cotizacionService.cotizacionById?.idCotizacion);
+
         //Actualizar valor total
         console.log(this.detalleCotizacionForm.value);
         this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
           next: (data) => {
             console.log(this.detalleCotizacionForm.value);
             this.detalleCotizacionForm.value.total = data.value;
+            let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+            detalleCotizaciones.push(this.formBiulder.control(this.detalleCotizacionForm.value));
+          },
+          complete: () => {
+            this.onNoClick();
+            this.loading = false;
+            console.log(this.detalleCotizacionForm.value);
+            return;
           },
           error: (e) => {
             console.error(e);
           }
         });
-        this.cotizacionService.addData(this.detalleCotizacionForm.value);
+        // this.cotizacionService.addData(this.detalleCotizacionForm.value);
+
+      }
+
+      if (this.cotizacionService.nuevaCotizacion) {
+        this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+          next: (data) => {
+            console.log(data.value);
+            console.log(this.detalleCotizacionForm.value);
+            this.detalleCotizacionForm.value.total = data.value;
+            let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+            detalleCotizaciones.push(this.formBiulder.control(this.detalleCotizacionForm.value));
+          },
+          error: (e) => {
+            console.error(e);
+          }
+        });
         this.onNoClick();
         this.loading = false;
-        console.log(this.detalleCotizacionForm.value);
         return;
       }
       // this.detalleCotizacionService.createDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
@@ -357,28 +384,8 @@ export class DetailCotizacionComponent implements OnInit {
       //   },
       //   error: (error)=> {this.utilidadService.mostrarAlerta("No se pudo crear el detalle de la cotización", "Error!", "bottom", "center"); console.error(error)}
       // });
-      console.log(this.detalleCotizacionForm.value);
-    } else {
-      if (this.cotizacionService.nuevaCotizacion) {
-        const listaDetalle = this.cotizacionService.getDetalleCotizacionToCreate();
-        // this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
-        //   next: (data) => {
-        //     console.log(this.detalleCotizacionForm.value);
-        //     this.detalleCotizacionForm.value.total = data.value;
-        //     listaDetalle.splice(this.data.index, 1, this.detalleCotizacionForm.value);
 
-        //   },
-        //   error: (e) => {
-        //     console.error(e);
-        //   }
-        // });
-        console.log(this.data.index);
-        console.log(listaDetalle);
-        this.onNoClick();
-        this.loading = false;
-        return;
-      }
-      console.log(this.detalleCotizacionForm.value);
+    } else {
       // this.detalleCotizacionService.editDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
       //   next: () => {
       //     this.loading = false
@@ -387,7 +394,6 @@ export class DetailCotizacionComponent implements OnInit {
       //   },
       //   error: (e)=> {console.error(e); this.utilidadService.mostrarAlerta("No se pudo editar el detalle de la cotización", "Error!", "bottom", "center")}
       // });
-      console.log(this.detalleCotizacionForm.value);
     }
   }
 
