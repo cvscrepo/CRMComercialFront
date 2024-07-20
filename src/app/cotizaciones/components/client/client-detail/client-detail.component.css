@@ -1,0 +1,21 @@
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
+}
+.example-full-width {
+  width: 400px;
+}
+.container{
+  width: 75rem;
+  height: 50rem;
+  padding : 3rem;
+}
+
+.buttons-position{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: end;
+}

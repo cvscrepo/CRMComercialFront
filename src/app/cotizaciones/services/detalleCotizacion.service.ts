@@ -6,7 +6,7 @@ import { responseApi } from '../../shared/interfaces/response.interface';
 import { DetalleCotizacion } from '../interfaces/detalleCotizacion.interface';
 import { UtilidadService } from '../../shared/services/utilidad.service';
 import { CotizacionService } from './cotizacion.service';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
 @Injectable({ providedIn: 'root' })
 export class DetalleCotizacionService {
@@ -63,19 +63,24 @@ export class DetalleCotizacionService {
   }
 
   createDetalleCotizacion(detalleCotizacion: DetalleCotizacion) {
-    return this.http.post<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion`, detalleCotizacion)
+    return this.http.post<responseApi<DetalleCotizacion>>(`${this.urlBase}/api/DetalleCotizacion`, detalleCotizacion)
       .pipe(
-        tap(detalleCotizacion => { console.log(detalleCotizacion.value, "Detalle Cotizacion"); return this.detalleCotizacion = detalleCotizacion.value }),
+        tap(detalleCotizacion => { console.log(detalleCotizacion.value, "Detalle Cotizacion"); return this.detalleCotizacion = [detalleCotizacion.value] }),
         catchError((e: any) => { console.error(e); return throwError(e) })
       );
   }
 
-  editDetalleCotizacion(detalle: DetalleCotizacion): Observable<responseApi<DetalleCotizacion[]>> {
-    return this.http.put<responseApi<DetalleCotizacion[]>>(`${this.urlBase}/api/DetalleCotizacion`, detalle)
+  editDetalleCotizacion(detalle: DetalleCotizacion): Observable<responseApi<DetalleCotizacion>> {
+    return this.http.put<responseApi<DetalleCotizacion>>(`${this.urlBase}/api/DetalleCotizacion`, detalle)
       .pipe(
-        tap(detalleEditado => { console.log(detalleEditado) }),
-        catchError((e) => { console.error(e); return throwError(e) })
-      )
+        tap(data => {
+          console.log(data);
+        }),
+        catchError((e) => {
+          console.error(e);
+          return throwError(e);
+        })
+      );
   }
 
   deleteDetalleCotizacion(idDetllaeCotizacion: number): Observable<responseApi<boolean>> {
@@ -83,7 +88,7 @@ export class DetalleCotizacionService {
       .pipe(
         tap(data => {
           const listadetalle = this._cotizacionService.form?.get('detalleCotizacions') as FormArray;
-          listadetalle.value.foreach((element:DetalleCotizacion , index:number) => {
+          listadetalle.value.forEach((element:DetalleCotizacion , index:number) => {
             if (element.idDetalleCotizacion === idDetllaeCotizacion) {
               listadetalle.removeAt(index);
             }
@@ -92,6 +97,34 @@ export class DetalleCotizacionService {
 
       )
   }
+
+  getValueOfDetalleCotizacion(detalleCotizacion:DetalleCotizacion){
+    return this.http.post<responseApi<number>>(`${this.urlBase}/api/DetalleCotizacion/valor`, detalleCotizacion).pipe(
+      tap((data) => {console.log(data)})
+    );
+  };
+
+
+  validateFormArrayLength(arrayName: string, minLength: number): ValidatorFn {
+    return (formGroup: AbstractControl): {[key: string]: any} | null => {
+      const formArray = formGroup.get(arrayName) as FormArray;
+      console.log(formArray, "Dentro de validateFormArrayLength");
+      if (formArray && formArray.value.length >= minLength) {
+        return null; // válido
+      }
+      return { formArrayLength: { valid: false, minLength } }; // no válido
+    };
+  }
+
+  // Validador personalizado para verificar si un el número de puestos es positivo
+  validatePositiveNumber(): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} | null => {
+      if (control.value > 0) {
+        return null; // válido
+      }
+      return { positiveNumber: { valid: false } }; // no válido
+    };
+  };
 
   get detalleCotizacionList(): DetalleCotizacion[] {
     return this.detalleCotizacion;

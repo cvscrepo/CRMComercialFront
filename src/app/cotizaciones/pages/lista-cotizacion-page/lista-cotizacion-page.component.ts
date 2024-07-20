@@ -8,21 +8,31 @@ import { Cotizacion } from '../../interfaces/cotizacion.interface';
   templateUrl: './lista-cotizacion-page.component.html',
   styleUrl: './lista-cotizacion-page.component.css'
 })
-export class ListaCotizacionPageComponent {
+export class ListaCotizacionPageComponent implements OnInit {
 
   public total:number = 0;
   public datosCargados: boolean = false;
   public cotizacionList: Cotizacion[] = [];
-  @Input()
+
   public termBusqueda:string = "";
 
   constructor(
     private _cotizacionSerivice : CotizacionService
-  ){}
+  ){
+    console.log("Lista cotizacion page");
+
+  }
+
+  ngOnInit(): void {
+
+  }
 
   emitValue(value: string){
     this.termBusqueda = value;
-    console.log(this.termBusqueda + " Lista page");
+  }
+
+  openCreateCotizacionDialog(){
+    this._cotizacionSerivice.openCreateCotizacionDetail();
   }
 
 }

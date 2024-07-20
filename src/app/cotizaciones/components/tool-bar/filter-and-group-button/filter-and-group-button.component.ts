@@ -25,38 +25,46 @@ export class FilterAndGroupButtonComponent implements OnChanges {
   public menuItemsFilter: Menu[]= [
     {
       item: "Nombre",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "Cliente",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "Total",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "Estado",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "fechaCreacion",
-      svg: "done"
+      svg: "done",
+      link: ""
     }
   ]
 
   public menuGroupItems: Menu[] = [
     {
       item: "Vendedor",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "Cliente",
-      svg: "done"
+      svg: "done",
+      link: ""
     },
     {
       item: "Fecha cotización",
-      svg: "done"
+      svg: "done",
+      link: ""
     }
   ];
 

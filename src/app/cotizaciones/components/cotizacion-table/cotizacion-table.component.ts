@@ -8,6 +8,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ClienteService } from '../../services/cliente.service';
+import { Cliente } from '../../interfaces/cliente.interface';
+import { MatDialog } from '@angular/material/dialog';
+import { ClientDetailComponent } from '../client/client-detail/client-detail.component';
 
 @Component({
   selector: 'crm-cotizacion-table',
@@ -19,11 +23,17 @@ export class CotizacionTableComponent implements OnInit, AfterViewInit, OnChange
   @Input()
   public termBusqueda: string = "";
   @Input()
-  public typeTable:boolean = true;
+  public typeTable:number = 1;
+  @Input()
+  public displayColumns?: string[];
+
   public datosCargados: boolean = false;
   public dataSource = new MatTableDataSource<Cotizacion>([]);
+  public dataSourceClients = new MatTableDataSource<Cliente>([]);
   public displayedColumns: string[] = ['checkbox', 'Cotización', 'Cliente', 'Correo', 'Telefono', 'Vendedor', 'Estado', 'Ingreso', 'svg'];
   public displayedColumns2: string[] = ['Cotización', 'Cliente', 'Vendedor', 'Estado', 'Ingreso'];
+  public displayedColumns3: string[] = ['Nombre Cliente', 'Contacto', 'Correo Electrónico', 'Telefono', 'Prospecto', 'Fecha creación'];
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort;
 
@@ -35,19 +45,31 @@ export class CotizacionTableComponent implements OnInit, AfterViewInit, OnChange
     private router: Router,
     private _liveAnnouncer: LiveAnnouncer,
     private elementRef: ElementRef,
-    private renderer: Renderer2,
-    private sanitizer: DomSanitizer
+    private dialog: MatDialog,
+    private clientService: ClienteService
   )
   {
+
   }
 
   ngOnInit(): void {
-    console.log("Table component");
-    this.getAllCotizaciones();
+    if(this.typeTable !== 3){
+      this.getAllCotizaciones();
+    }else{
+      this.subscribeToClientUpdates();
+      this.getAllClientes();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.dataSource.filter = changes['termBusqueda'].currentValue.trim().toLowerCase();
+    if(this.typeTable !== 3){
+      this.dataSource.filter = changes['termBusqueda'].currentValue.trim().toLowerCase();
+      this.getAllCotizaciones();
+    }else{
+      console.log("entra aqui");
+      this.dataSourceClients.filter = changes['termBusqueda'].currentValue.trim().toLowerCase();
+      this.getAllClientes();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -71,6 +93,11 @@ export class CotizacionTableComponent implements OnInit, AfterViewInit, OnChange
     console.log(id);
   }
 
+  public openClienDetail(id:number){
+    this.clientService.openClienDetail(id);
+  }
+
+
   public getAllCotizaciones()
   {
     if (this._cotizacionSerivice.cotizacionList.length === 0) {
@@ -83,6 +110,7 @@ export class CotizacionTableComponent implements OnInit, AfterViewInit, OnChange
               }
             });
             this.dataSource.data = this._cotizacionSerivice.cotizacionList;
+
           }
         },
         complete: () => {
@@ -96,5 +124,29 @@ export class CotizacionTableComponent implements OnInit, AfterViewInit, OnChange
       this.dataSource.data = this._cotizacionSerivice.cotizacionList;
       this.datosCargados = true;
     }
+  }
+
+  public getAllClientes(){
+    if(this.clientService.clienteSubject.value.length === 0){
+      this.clientService.getClientes().subscribe({
+        next: (data: responseApi<Cliente[]>) => {
+          if(data.success){
+            this.dataSourceClients.data = data.value;
+          }
+        },
+        complete: () => {
+          this.datosCargados = true;
+        },
+        error: (e) => {
+          console.error(e);
+        }
+      });
+    }
+  }
+
+  private subscribeToClientUpdates(): void {
+    this.clientService.clientes$.subscribe(clientes => {
+      this.dataSourceClients.data = clientes;
+    });
   }
 }

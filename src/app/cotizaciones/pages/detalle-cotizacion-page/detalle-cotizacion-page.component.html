@@ -1,6 +1,6 @@
 <section class="w-max h-max">
   <article class="bg-white ">
-    <crm-tool-bar [type]="typeToolbar" ></crm-tool-bar>
+    <crm-tool-bar [type]="typeToolbar" (createdCliked)="openCreateCotizacionDialog()" ></crm-tool-bar>
   </article>
   <section class="grid w-screen h-max grid-cols-7 bg-grisBg">
     <crm-lateral-list class="col-span-2 mt-2 mr-2 bg-white overflow-hidden" ></crm-lateral-list>

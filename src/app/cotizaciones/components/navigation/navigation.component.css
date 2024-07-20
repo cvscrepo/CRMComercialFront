@@ -2,6 +2,15 @@
   background-color: #004A98;
   height: 50px;
 }
+
+.cursor{
+  cursor: pointer;
+}
+
+.index{
+  z-index: 99;
+}
+
 .span-text{
   color: white;
   font-size: xx-large;
@@ -29,9 +38,10 @@
 
 .menu-list {
   position: absolute;
-  top: 6.0vmin;
-  right: 0.5vmin;
+  top: 5.2vmin;
+  right: 0.2vmin;
   background-color: #f9f9f9;
+  border: 0.5px solid gray;
   width: 30vmin;
 }
 
@@ -46,14 +56,36 @@
   padding-top: 3px;
 }
 
+.menu-list2 {
+  position: absolute;
+  top: 5.5vmin;
+  left: 35vmin;
+  background-color: #f9f9f9;
+  border: 0.5px solid gray;
+  width: 25vmin;
+}
+
+.menu-list2 li {
+  padding: 10px;
+  display: flex;
+  align-content: center;
+}
+
+.menu-list2 li a {
+  margin-left: 10px;
+  padding-top: 3px;
+}
 .text-title{
   font-size: 3vmin;
 }
-
 .text-menu{
   font-size: large;
 }
-
 .spacer {
   flex: 1 1 auto;
+}
+.imageLogonav{
+  width: 8vmin;
+  height: 3vmin;
+  margin-left: 2vmin;
 }

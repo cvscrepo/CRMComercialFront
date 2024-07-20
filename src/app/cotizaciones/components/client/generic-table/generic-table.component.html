@@ -1,0 +1,18 @@
+<table class="generic-table">
+  <thead>
+    <tr>
+      <th *ngFor="let column of columns">{{ column.key }}</th>
+      <th>Eliminar</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let value of values.value">
+      <td *ngFor="let column of columns" (click)="openDetail(value)" >{{ value[column.value] }}</td>
+      <td class="delete-cell">
+        <button class="delete-button" (click)="onDelete(value)" [disabled]="stateOf">
+          <mat-icon [color]="!stateOf ? 'warn' : 'gray'" >delete</mat-icon>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

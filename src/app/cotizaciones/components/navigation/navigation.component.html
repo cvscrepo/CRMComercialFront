@@ -1,14 +1,20 @@
-<section>
+<section class="index">
   <mat-toolbar class="toolbar">
-    <span class="span-text text-title" [routerLink]="['/cotizacion/list']">CRM</span>
+    <img src="https://cvsc.co/images-shared/logoColvisegBlanco.svg" alt="logoColviseg" class="imageLogonav">
+    <span class="cursor span-text text-title" [routerLink]="['/cotizacion/list']">CRM</span>
+
     <button class="menu-text text-menu">Dashboard</button>
-    <button class="menu-text text-menu">Ventas</button>
+    <button class="menu-text text-menu" (click)="toggle2()">Ventas</button>
+    <button class="menu-text text-menu" routerLink="/cotizacion/clients">Clientes</button>
     <span class="spacer"></span>
     <mat-icon class="icon-chat-unread">mark_unread_chat_alt</mat-icon>
-    <mat-icon class="icon-chat-unread" >camera_alt</mat-icon>
-    <button class="menu-right-text text-menu" (click)="toogle()" >{{nombreUsuario}}</button>
+    <mat-icon class="icon-chat-unread">camera_alt</mat-icon>
+    <button class="menu-right-text text-menu" (click)="toogle()">{{nombreUsuario}}</button>
   </mat-toolbar>
   <ul class="menu-list z-40" *ngIf="menuProfile">
-    <li *ngFor="let item of menuItems"><mat-icon>{{item.svg}}</mat-icon> <a href="#" class="">{{item.item}}</a></li>
+    <li *ngFor="let item of menuItems"><mat-icon>{{item.svg}}</mat-icon> <a [routerLink]="item.link" (click)="close()" class="">{{item.item}}</a></li>
+  </ul>
+  <ul class="menu-list2 z-40" *ngIf="menuSells">
+    <li *ngFor="let item of menuVentasButtons"><mat-icon>{{item.svg}}</mat-icon> <a [routerLink]="item.link" (click)="close1()" class="">{{item.item}}</a></li>
   </ul>
 </section>

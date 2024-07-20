@@ -1,5 +1,5 @@
 import { Servicio } from './../../interfaces/servicio.interface';
-import { AfterContentChecked, AfterViewChecked, Component, Inject, Input, OnInit, input, EventEmitter } from '@angular/core';
+import { AfterContentChecked, AfterViewChecked, Component, Inject, Input, OnInit, input, EventEmitter, Optional } from '@angular/core';
 import { Form, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TipoServicio } from '../../interfaces/tipoServicio.interface';
@@ -9,6 +9,7 @@ import { CotizacionService } from '../../services/cotizacion.service';
 import { Sucursal } from '../../interfaces/sucursal.interface';
 import { first } from 'rxjs';
 import { UtilidadService } from '../../../shared/services/utilidad.service';
+import { responseApi } from '../../../shared/interfaces/response.interface';
 
 @Component({
   selector: 'crm-detail-cotizacion',
@@ -18,6 +19,10 @@ import { UtilidadService } from '../../../shared/services/utilidad.service';
 export class DetailCotizacionComponent implements OnInit {
 
   //Dias seleccionados de la semana
+  @Input()
+  public defaultDetalle: boolean = true;
+  @Input()
+  public dataDetalle: any;
 
   public diasSeleccionados = new FormControl<string[]>([]);
   public valorDiasSelect!: FormGroup;
@@ -27,8 +32,8 @@ export class DetailCotizacionComponent implements OnInit {
   //Formgroup
   public detalleCotizacionForm!: FormGroup;
   public listaDeHoras: FormGroup = this.formBiulder.group({
-    minutosInicioServicio: '',
-    minutosFinServicio: ''
+    minutosInicioServicio: ['', Validators.required],
+    minutosFinServicio: ['', Validators.required]
   });
   public listaHoras: string[] = [];
   public listaServicios: Servicio[] = [];
@@ -36,6 +41,7 @@ export class DetailCotizacionComponent implements OnInit {
   public detalleCotizacionVariables: DetalleCotizacionVariable[] = [];
 
   //States
+  public newDetail: boolean = false;
   public armado: boolean = false;
   public loading: boolean = false;
   public editMode: boolean = false;
@@ -43,25 +49,27 @@ export class DetailCotizacionComponent implements OnInit {
 
 
   constructor(
-    public dialogRef: MatDialogRef<DetailCotizacionComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { detalle: DetalleCotizacion, editMode: boolean, newDetail: boolean, index: number },
+    @Optional() public dialogRef: MatDialogRef<DetailCotizacionComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: { detalle: DetalleCotizacion, editMode: boolean, newDetail: boolean, index: number },
     private formBiulder: FormBuilder,
     private cotizacionService: CotizacionService,
     private detalleCotizacionService: DetalleCotizacionService,
     private utilidadService: UtilidadService
   ) {
-    this.editMode = this.data.editMode;
+    this.editMode = this.stateOfDetail
     this.listaSucursales = this.cotizacionService.listaSucursal;
-    console.log("Sucursales");
-    console.log(this.listaSucursales);
-    this.listaServicios = this.cotizacionService.listaServicios;
+    this.listarServicios();
+    this.listarVariablesEconomicas();
+    if (this.data) {
+      this.dataDetalle = this.data;
+    }
     this.detalleCotizacionForm = this.formBiulder.group({
       idDetalleCotizacion: [0],
       idCotizacion: [0, [Validators.required]],
-      idServicio: 0,
-      idSucursal: 0,
-      cantidadServicios: 1,
-      detalleServicio: "",
+      idServicio: [0, Validators.required],
+      idSucursal: [0, [Validators.required]],
+      cantidadServicios: [1, this.detalleCotizacionService.validatePositiveNumber()],
+      detalleServicio: [""],
       total: 0,
       createdAt: "",
       updatedAt: "",
@@ -69,26 +77,41 @@ export class DetailCotizacionComponent implements OnInit {
       detalleCotizacionVariables: this.formBiulder.array([]),
       idServicioNavigation: {},
       idSucursalNavigation: []
-    });
+    }, { validators: this.detalleCotizacionService.validateFormArrayLength("detalleCotizacionVariables", 1) });
+
     this.valorDiasSelect = this.formBiulder.group({});
+
   }
 
   ngOnInit(): void {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
     //Add 'implements OnInit' to the class.
-
+    this.editMode ? this.detalleCotizacionForm.enable() : this.detalleCotizacionForm.disable();
     this.listaHoras = this.detalleCotizacionService.listarHoras();
-    if (this.data.detalle !== undefined) {
-      // this.detalleCotizacion = this.data.detalle;
-      this.initializelFormWithDetail();
-      console.log(1);
-    } else {
-
+    // On this method we initialize the form with the detail if it exists or its a popup
+    if (this.data) {
+      if (this.data.detalle !== undefined) {
+        // this.detalleCotizacion = this.data.detalle;
+        this.initializelFormWithDetail();
+        console.log(1);
+      } else {
+        // If it enter here it means is a new detail
+        this.newDetail = true;
+      }
+    }else{
+     // If it's not a popup, it's a new detail
+     this.editMode = true;
+      this.detalleCotizacionForm.enable();
     }
+    console.log(this.data);
   }
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  get stateOfDetail(): boolean {
+    return this.cotizacionService.isDisabled;
   }
 
   isValidField(field: string): boolean | null {
@@ -111,7 +134,9 @@ export class DetailCotizacionComponent implements OnInit {
         if (this.valorDiasSelect.controls['dia'] === undefined) {
 
           let detalleCotizacionVariable;
-          if (this.data.detalle) detalleCotizacionVariable = this.data.detalle.detalleCotizacionVariables.find(v => v.idVariablesEconomicasNavigation.nombre === dia);
+          if(this.data){
+            if (this.data.detalle) detalleCotizacionVariable = this.data.detalle.detalleCotizacionVariables.find(v => v.idVariablesEconomicasNavigation.nombre === dia);
+          }
           if (detalleCotizacionVariable) {
             const control = new FormControl(detalleCotizacionVariable.valor, [Validators.required])
             this.valorDiasSelect.addControl(dia, control);
@@ -229,7 +254,7 @@ export class DetailCotizacionComponent implements OnInit {
       let horaMinutos = this.detalleCotizacionService.horaAMinutos(event.value);
       //Si encuentra la hora le cambia el valor del detalle, si no le agrega una nueva
       if (horaToCahnge) {
-        horaToCahnge.valor = horaMinutos;
+        horaToCahnge.valor = horaMinutos.toString();
       } else {
         const variableEconomica = this.cotizacionService.listaVariablesEconomicas.find(v => v.nombre === (id == 1 ? "minutosInicioServicio" : "minutosFinServicio"));
         let variableDiasDetalle: DetalleCotizacionVariable = {
@@ -250,13 +275,11 @@ export class DetailCotizacionComponent implements OnInit {
     }
   }
 
-  daysRequiredServiceVariableDetail() {
+  daysRequiredServiceVariableDetail(): void {
     let counter: number = 0;
 
     const diasRequeridos = this.detalleCotizacionForm.value.detalleCotizacionVariables.find((detalle: any) => detalle.idVariablesEconomicasNavigation.nombre === "diasRequeridoServicio");
-    if (diasRequeridos) {
-      diasRequeridos.valor = counter.toString();
-    } else {
+    if (!diasRequeridos) {
       this.detalleCotizacionForm.value.detalleCotizacionVariables.forEach((element: any) => {
         if (this.diasDeLaSemana.includes(element.idVariablesEconomicasNavigation.nombre)) {
           counter += parseInt(element.valor);
@@ -319,83 +342,131 @@ export class DetailCotizacionComponent implements OnInit {
     }
   }
 
+  validateInfoBeforeSave(): boolean {
+    console.log(this.detalleCotizacionForm);
+    let formValid: boolean = this.detalleCotizacionForm.valid;
+    let selectedDays = this.diasSeleccionados.valid;
+    let selectedHours = this.listaDeHoras.valid;
+    return selectedDays && selectedHours && formValid;
+  }
+
+  validateSecondButton():boolean{
+    let validCount = this.detalleCotizacionForm.get('cantidadServicios')!.valid;
+    let selectedDays = this.diasSeleccionados.valid;
+    let selectedHours = this.listaDeHoras.valid;
+    return selectedDays && selectedHours && validCount;
+  }
 
   guardarDetalleCotizacion() {
     this.loading = true;
+    this.detalleCotizacionForm;
     this.daysRequiredServiceVariableDetail();
     this.armadoAndSMLVCheck();
     //Include amount of services variabledetail in the form
     // this.detalleCotizacionForm.value.detalleCotizacionVariables = listaEditada;
-    if (this.data.newDetail) {
-      console.log(this.cotizacionService.nuevaCotizacion)
-      if (!this.cotizacionService.nuevaCotizacion) {
-        const sucursalFound = this.listaSucursales.find(s => s.idSucursal === this.detalleCotizacionForm.value.idSucursal);
-        const servicioFuond = this.listaServicios.find(s => s.idServicio === this.detalleCotizacionForm.value.idServicio);
-        this.detalleCotizacionForm.get('idSucursalNavigation')?.setValue(sucursalFound);
-        this.detalleCotizacionForm.get('idServicioNavigation')?.setValue(servicioFuond);
-        this.detalleCotizacionForm.get('detalleCotizacionInventarios')?.setValue([]);
-        let idCotizacion = this.detalleCotizacionForm.get('idCotizacion')?.setValue(this.cotizacionService.cotizacionById?.idCotizacion);
+    if (this.cotizacionService.stateNuevaCotizacion) {
 
-        //Actualizar valor total
-        console.log(this.detalleCotizacionForm.value);
-        this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
-          next: (data) => {
-            console.log(this.detalleCotizacionForm.value);
-            this.detalleCotizacionForm.value.total = data.value;
-            let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+      this.detalleCotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+        next: (data) => {
+          console.log(data.value);
+          console.log(this.detalleCotizacionForm.value);
+          const totalPrev = this.detalleCotizacionForm.get('total')?.value;
+          this.detalleCotizacionForm.get('total')?.setValue(data.value);
+          let idServicio = this.detalleCotizacionForm.get('idServicio');
+          let idSucursal = this.detalleCotizacionForm.get('idSucursal');
+          let sucursal = this.cotizacionService.listaSucursal.find(s => s.idSucursal === idSucursal?.value);
+          let servicio = this.cotizacionService.listaServicios.find(s => s.idServicio === idServicio?.value);
+          this.detalleCotizacionForm.get('idSucursalNavigation')?.setValue(sucursal);
+          this.detalleCotizacionForm.get('idServicioNavigation')?.setValue(servicio);
+          let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+          if (totalPrev === 0) {
             detalleCotizaciones.push(this.formBiulder.control(this.detalleCotizacionForm.value));
-          },
-          complete: () => {
-            this.onNoClick();
-            this.loading = false;
-            console.log(this.detalleCotizacionForm.value);
-            return;
-          },
-          error: (e) => {
-            console.error(e);
+          } else {
+            this.detalleCotizacionForm.get('total')?.setValue(data.value);
+            this.cotizacionService.editDetalleCotizacion(this.detalleCotizacionForm.value, this.data.index);
           }
-        });
-        // this.cotizacionService.addData(this.detalleCotizacionForm.value);
-
-      }
-
-      if (this.cotizacionService.nuevaCotizacion) {
-        this.cotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
-          next: (data) => {
-            console.log(data.value);
-            console.log(this.detalleCotizacionForm.value);
-            this.detalleCotizacionForm.value.total = data.value;
-            let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
-            detalleCotizaciones.push(this.formBiulder.control(this.detalleCotizacionForm.value));
-          },
-          error: (e) => {
-            console.error(e);
-          }
-        });
-        this.onNoClick();
-        this.loading = false;
-        return;
-      }
-      // this.detalleCotizacionService.createDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
-      //   next: (data) => {
-      //     this.loading = false;
-      //     this.utilidadService.mostrarAlerta("Detalle de la cotización creado", "Urra!", "bottom", "center")
-      //     this.onNoClick();
-      //   },
-      //   error: (error)=> {this.utilidadService.mostrarAlerta("No se pudo crear el detalle de la cotización", "Error!", "bottom", "center"); console.error(error)}
-      // });
-
+        },
+        error: (e) => {
+          console.error(e);
+        }
+      });
+    } else if (this.newDetail) {
+      const sucursalFound = this.listaSucursales.find(s => s.idSucursal === this.detalleCotizacionForm.value.idSucursal);
+      const servicioFuond = this.listaServicios.find(s => s.idServicio === this.detalleCotizacionForm.value.idServicio);
+      this.detalleCotizacionForm.get('idSucursalNavigation')?.setValue(sucursalFound);
+      this.detalleCotizacionForm.get('idServicioNavigation')?.setValue(servicioFuond);
+      this.detalleCotizacionForm.get('detalleCotizacionInventarios')?.setValue([]);
+      let idCotizacion = this.detalleCotizacionForm.get('idCotizacion')?.setValue(this.cotizacionService.cotizacionById?.idCotizacion);
+      //Create detail cotizacion and add it to the formArray
+      this.detalleCotizacionService.createDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+        next: (data) => {
+          console.log(this.detalleCotizacionForm.value);
+          this.detalleCotizacionForm.get("total")?.setValue(data.value);
+          let detalleCotizaciones = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+          this.detalleCotizacionForm.get('total')?.setValue(data.value.total);
+          detalleCotizaciones.push(this.formBiulder.control(this.detalleCotizacionForm.value));
+        },
+        error: (e) => {
+          console.error(e);
+          this.utilidadService.mostrarAlerta("No se pudo crear el detalle de la cotización", "Error!", "bottom", "center");
+        }
+      });
     } else {
-      // this.detalleCotizacionService.editDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
-      //   next: () => {
-      //     this.loading = false
-      //     this.utilidadService.mostrarAlerta("Detalle de la cotización editado", "Bien hecho!", "bottom", "center");
-      //     this.onNoClick();
-      //   },
-      //   error: (e)=> {console.error(e); this.utilidadService.mostrarAlerta("No se pudo editar el detalle de la cotización", "Error!", "bottom", "center")}
-      // });
+      this.detalleCotizacionService.editDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+        next: (data) => {
+          this.loading = false;
+          console.log(data);
+          const detallesArray = this.cotizacionService.form?.get('detalleCotizacions') as FormArray;
+          if (detallesArray) {
+            detallesArray.controls.forEach((control, index) => {
+              if (control.value.idDetalleCotizacion === this.detalleCotizacionForm.value.idDetalleCotizacion) {
+                // Actualizar el detalle cotización en el FormArray
+                detallesArray.controls.at(index)?.patchValue(data.value);
+                window.location.reload();
+                console.log(detallesArray);
+              }
+            });
+          };
+          this.utilidadService.mostrarAlerta("Detalle de la cotización editado", "Bien hecho!", "bottom", "center");
+          this.onNoClick();
+        },
+        error: (e) => {
+          console.error(e);
+          this.utilidadService.mostrarAlerta("No se pudo editar el detalle de la cotización", "Error!", "bottom", "center");
+          console.log(this.detalleCotizacionForm.value);
+        }
+      });
+      console.log(this.detalleCotizacionForm.value);
     }
+    this.onNoClick();
+    this.loading = false;
+    return;
   }
 
+  getValueOfQuote(){
+    this.detalleCotizacionService.getValueOfDetalleCotizacion(this.detalleCotizacionForm.value).subscribe({
+      next: (data) => {
+        this.detalleCotizacionForm.get('total')?.setValue(data.value);
+      },
+      error: (e) => {
+        console.error(e);
+      }
+    });
+  }
 
+  public listarServicios() {
+    this.cotizacionService.listarServicios().subscribe({
+      next: (data) => {
+        this.listaServicios = data.value;
+      },
+      complete: () => { },
+      error: (error: any) => { console.error(error.message) }
+    })
+  }
+
+  public listarVariablesEconomicas() {
+    this.cotizacionService.listarVaraibles().subscribe({
+      next: (data) => { }
+    });
+  }
 }

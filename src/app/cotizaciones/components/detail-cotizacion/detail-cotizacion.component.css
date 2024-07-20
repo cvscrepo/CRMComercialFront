@@ -1,6 +1,13 @@
 .container{
-  width: 90rem;
+  width: 75rem;
   height: 50rem;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.containerComponent{
+  width: 100%;
+  height: 70%;
 }
 
 .imagen{
@@ -9,11 +16,59 @@
   background-position: center; /* Posición de la imagen */
 }
 
-.container-text{
-  width: 100%;
-}
+
 
 .input-text{
   overflow-wrap: break-word;
   flex-wrap: wrap;
+}
+
+.initForm{
+  height: auto;
+}
+
+.emptyDiv{
+  margin-top: 118px;
+}
+
+.button {
+  display: inline-block;
+  width: 500px;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  background-color: #004A98;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  color: #fff;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.button:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+.button:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.button:disabled {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.divInformation{
+  background-color: #f8f9fa;
+  padding: 10px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
 }

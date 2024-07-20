@@ -1,0 +1,8 @@
+<section>
+  <article class="border border-b-gray-300 ">
+    <crm-tool-bar [type]="0" (termBusqueda)="emitValue($event)" (createdCliked)="openDetailClient()"  ></crm-tool-bar>
+  </article>
+  <article>
+    <crm-cotizacion-table [typeTable]="3" [termBusqueda]="termBusqueda" ></crm-cotizacion-table>
+  </article>
+</section>

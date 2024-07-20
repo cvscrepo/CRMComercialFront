@@ -25,6 +25,11 @@ import { LoadingComponent } from './components/loading/loading.component';
 import { DetailCotizacionComponent } from './components/detail-cotizacion/detail-cotizacion.component';
 import { SelectsOfCotizacionComponent } from './components/cotizacion-detail/selects-of-cotizacion/selects-of-cotizacion.component';
 import { ButtonAddDetailComponent } from './components/cotizacion-detail/button-add-detail/button-add-detail.component';
+import { ClientsPageComponent } from './pages/clients-page/clients-page.component';
+import { ClientDetailComponent } from './components/client/client-detail/client-detail.component';
+import { GenericTableComponent } from './components/client/generic-table/generic-table.component';
+import { SucursalModalComponent } from './components/client/sucursal-modal/sucursal-modal.component';
+import { CotizadorPageComponent } from './pages/cotizador-page/cotizador-page.component';
 
 
 @NgModule({
@@ -50,6 +55,11 @@ import { ButtonAddDetailComponent } from './components/cotizacion-detail/button-
     DetailCotizacionComponent,
     SelectsOfCotizacionComponent,
     ButtonAddDetailComponent,
+    ClientsPageComponent,
+    ClientDetailComponent,
+    GenericTableComponent,
+    SucursalModalComponent,
+    CotizadorPageComponent,
   ],
   imports: [
     CommonModule,

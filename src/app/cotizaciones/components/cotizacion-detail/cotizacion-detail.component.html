@@ -2,34 +2,35 @@
 <mat-card-header>
   <mat-progress-bar mode="indeterminate" color="bg-blue-500"></mat-progress-bar>
 </mat-card-header>
+}@else {
+<div style="height: 10px; width: 100%;"></div>
 }
 @if(getNewCotizacionState()){
 <mat-card-header class="p-10 ">
-  <crm-create-and-edit-button [typeButtons]="3"></crm-create-and-edit-button>
+  <crm-create-and-edit-button [typeButtons]="3" class="buttons"></crm-create-and-edit-button>
 </mat-card-header>
 }
-<crm-cotizacion-state [estado]="myForm.value.estado ?? 2" (estadoChanged)="stateChanged($event)"
-  [numeroCotizacion]="cotizacionByIdValue?.numeroDocumento === undefined ? 00001 : cotizacionByIdValue?.numeroDocumento"
- [isDisabled]="!getDisabledState()"></crm-cotizacion-state>
-<form *ngIf="getNewCotizacionState()" [formGroup]="myForm">
+<crm-cotizacion-state [estado]="estado" (estadoChanged)="stateChanged($event)"
+  [numeroCotizacion]="valorNumeroDeCotizacion" [isDisabled]="!getDisabledState()"></crm-cotizacion-state>
+<form *ngIf="getNewCotizacionState()" [formGroup]="myForm" class="firstForm ">
   <label for="titulo" class="mr-5">Nombre Cotización</label>
-  <input type="text" id="titulo" formControlName="nombre" class="border border border-azulColvi w-96 rounded-sm p-1"
+  <input type="text" id="titulo" formControlName="nombre" class="border border border-azulColvi rounded-lg p-1"
     (change)="changeNameCotizacion()">
+
 </form>
-<section class="flex">
-  <div class="mt-10 mr-5 mb-5 ">
-    <p class="block pb-5">Cliente</p>
-    <p class="block pb-5">Vendedor</p>
-    <p class="block ">Expiración</p>
+<section class="flex my-5 font-medium text-sm text-grisText">
+  <div class=" p-7 ">
+    <p class="block">Cliente</p>
+    <p class="block pt-9">Vendedor</p>
+    <p class="block pt-9">Expiración</p>
   </div>
-  <form class="mt-9" #selectContainer [formGroup]="myForm">
+  <form class="my-5  bordered" #selectContainer [formGroup]="myForm">
     <div class="relative">
       <form action="" [formGroup]="myFormStates">
         <input formControlName="termOfSearchClient" (click)="markAsTouched('termOfSearchClient')"
-        class="p-1 rounded-sm block  w-80"
-        [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
+          class="p-1 rounded-sm block  w-80"
+          [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
       </form>
-      <span *ngIf="myForm.controls['idCliente'].getError('required')">El nombre del cliente no es válido</span>
 
       <select size="5" formControlName="idCliente" *ngIf="isTouchedField('termOfSearchClient')"
         (change)="seleccionarCampo(true)"
@@ -41,15 +42,16 @@
           {{cliente.nombreCompleto}}</option>
       </select>
     </div>
+    <span *ngIf="myForm.controls['idCliente'].getError('required');else span">El nombre del cliente no es válido</span>
+    <ng-template #span><span class="text-white">válido</span></ng-template>
     <div class="relative">
       <!-- Este formControlName es una propiedad new FormControl que está en el componente cotizacion-detail.component.ts -->
       <form action="" [formGroup]="myFormStates">
         <input list="lista-clientes" (click)="markAsTouched('termOfSearchUser')" formControlName="termOfSearchUser"
-        class=" p-1 rounded-sm block w-80 mt-5"
-        [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
+          class=" p-1 rounded-sm block w-80 mt-5"
+          [ngClass]="getDisabledState()? 'bg-white border border-azulColvi rounded-sm':''">
       </form>
-      <span *ngIf="myForm.controls['idUsuario'].getError('required')">El nombre del usuario no es válido</span>
-      <select size="5" formControlName="idUsuario"  *ngIf="isTouchedField('termOfSearchUser')"
+      <select size="5" formControlName="idUsuario" *ngIf="isTouchedField('termOfSearchUser')"
         (change)="seleccionarCampo(false)"
         class="bg-white w-80 absolute top-8 left-0 truncate border-2 rounded border-inputBg mi-select">
         <option [value]="0">Seleccionar un campo</option>
@@ -57,8 +59,10 @@
           [value]="usuario.idUsuario">
           {{usuario.nombreCompleto}}</option>
       </select>
+      <span *ngIf="myForm.controls['idUsuario'].getError('required');else span">El nombre del usuario no es válido</span>
+      <ng-template #span><span class="text-white">válido</span></ng-template>
     </div>
-    <input type="datetime-local" formControlName="expiracion" class="mt-7"  required>
+    <input type="datetime-local" formControlName="expiracion" class="mt-4 time-box" required>
   </form>
 </section>
 <crm-horizontal-menu></crm-horizontal-menu>
@@ -70,27 +74,27 @@
   <form class="col-span-3 w-full" [formGroup]="myForm">
     <div class="border border-gray-300 rounded-md p-3 mb-3 bg-grisBgClaro shadow-lg">
       <p class="pr-5 text-lg text-grisText">Descripción de la cotización:</p>
-      <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text" name="" id="" formControlName="descripcion"></textarea>
+      <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text" name="" id=""
+        formControlName="descripcion"></textarea>
     </div>
     <div class="border border-gray-300 rounded-md p-3 mb-3 bg-grisBgClaro shadow-lg">
       <p class="pr-5 text-lg text-grisText">Comentarios:</p>
-      <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text" name="" id="" formControlName="comentarios"></textarea>
+      <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text" name="" id=""
+        formControlName="comentarios"></textarea>
     </div>
   </form>
   <div class="col-start-4 flex justify-end">
     <div class="flex flex-wrap w-96 justify-end h-48 ">
       <span
         class=" border-2 border-azulColvi p-2 w-48 text-center aling-center text-lg text-grisText m-0">Subtotal</span>
-      <span
-        class=" border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{subtotal
+      <span class=" border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{subtotal
         === undefined ? 0 : subtotal | currency:'COP':'symbol-narrow':'1.2-2' }}</span>
-      <span class="border-2 border-azulColvi p-2 w-48 text-center aling-center text-lg text-grisText m-0">Base para IVA</span>
-      <span
-        class="border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{subtotal
+      <span class="border-2 border-azulColvi p-2 w-48 text-center aling-center text-lg text-grisText m-0">Base para
+        IVA</span>
+      <span class="border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{subtotal
         === undefined ? 0 : subtotal * 0.1 | currency:'COP':'symbol-narrow':'1.2-2' }}</span>
       <span class="border-2 border-azulColvi p-2 w-48 text-center aling-center text-lg text-grisText m-0">IVA</span>
-      <span
-        class="border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{ valorIva
+      <span class="border-2 border-azulColvi p-2 w-48 text-lg text-center aling-center text-grisText m-0">{{ valorIva
         === undefined ? 0 : valorIva | currency:'COP':'symbol-narrow':'1.2-2' }}</span>
       <span
         class="border-2 border-azulColvi border-r-white bg-azulColvi text-white p-2 w-48 text-lg text-center aling-center text-grisText m-0">Total:</span>

@@ -1,6 +1,4 @@
-
-
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { Cotizacion } from '../../interfaces/cotizacion.interface';
 import { CotizacionService } from '../../services/cotizacion.service';
 import { responseApi } from '../../../shared/interfaces/response.interface';
@@ -62,15 +60,12 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
         this._cotizacionService.nuevaCotizacion = false;
         this.getCotizacionById(this.idCotizacionDetail);
         this.getDetalleCotizacion(this.idCotizacion);
-        this.listarVariablesEconomicas();
-        this.listarServicios();
+
       } else {
 
         this._cotizacionService.isDisabled = true;
         this._cotizacionService.resetForm();
         this._cotizacionService.setNuevaCotizacion();
-        this.listarVariablesEconomicas();
-        this.listarServicios();
       }
     })
     this.myForm = this._cotizacionService.form!;
@@ -88,6 +83,7 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
     }
 
   }
+
 
   ngOnInit(): void {
     if (this._cotizacionService.nuevaCotizacion) {
@@ -252,12 +248,6 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
       })
   }
 
-  public listarVariablesEconomicas() {
-    this._cotizacionService.listarVaraibles().subscribe({
-      next: (data) => { }
-    });
-  }
-
   public listarSucursal(idCliente: number) {
     this._cotizacionService.listarSucursal(idCliente).subscribe({
       next: (data) => { console.log(data.value); },
@@ -266,13 +256,7 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
   }
 
 
-  public listarServicios() {
-    this._cotizacionService.listarServicios().subscribe({
-      next: (data) => { },
-      complete: () => { },
-      error: (error: any) => { console.error(error.message) }
-    })
-  }
+
 
 
   get cotizacionByIdValue() {
@@ -308,6 +292,9 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
     return this._cotizacionService.loading;
   }
 
+  get estado(): number {
+    return this._cotizacionService.form?.get('estado')?.value || 2;
+  }
 
   get subtotal(): number {
     return this._cotizacionService.form?.value.detalleCotizacions?.reduce((acc: number, element:DetalleCotizacion) => acc + element.total, 0) || 0;
@@ -319,6 +306,10 @@ export class CotizacionDetailComponent implements OnInit, OnChanges {
 
   get valorTotal(): number {
     return this._cotizacionService.form?.get('total')?.value || 0;
+  }
+
+  get valorNumeroDeCotizacion():number | undefined{
+    return this._cotizacionService.form?.get('numeroDocumento')?.value;
   }
 }
 

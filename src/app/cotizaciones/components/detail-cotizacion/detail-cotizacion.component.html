@@ -1,99 +1,124 @@
-<section class="container ">
-  <div>
-    <p class="text text-3xl pl-10 pt-5 text-grisText">Detalle Cotizacion</p>
+<section [ngClass]="defaultDetalle ? 'container': 'containerComponent'">
+  <div *ngIf="defaultDetalle">
+    <div>
+      <p class="text text-3xl pl-10 pt-5 text-grisText">Detalle Cotizacion</p>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="w-full mr-10 flex justify-end mt-10 ">
+      <mat-icon>settings</mat-icon>
+      <span class="mr-10 ml-2 text-lg">Variables económicas</span>
+    </div>
   </div>
-  <mat-divider></mat-divider>
-  <div class="w-full mr-10 flex justify-end mt-10 ">
-    <mat-icon>settings</mat-icon>
-    <span class="mr-10 ml-2 text-lg">Variables económicas</span>
-  </div>
-  <form class="grid grid-cols-3 pl-10 pt-10 pr-10" [formGroup]="detalleCotizacionForm">
-    <div class="col-span-1 h-80 mr-2">
-      <!-- <p class="text-lg">Cantidad de puestos</p> -->
-      <mat-form-field class="w-full">
-        <mat-label>Cantidad de puestos</mat-label>
-        <input matInput type="number" formControlName="cantidadServicios" [disabled]="!editMode">
-      </mat-form-field>
-      <!-- <p>Dias requeridos del servicio: </p> -->
-      <mat-form-field class="w-full mt-10">
-        <mat-label class="text-sm">Días requeridos del servicio</mat-label>
-        <mat-select multiple [formControl]="diasSeleccionados" (selectionChange)="onDiaChange($event)">
-          <mat-option *ngFor="let dia of diasDeLaSemana" [value]="dia">{{dia}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+  <form class="grid pl-10  pr-10 initForm" [ngClass]="defaultDetalle ? 'grid-cols-2':'grid-cols-1 mx-40'" [formGroup]="detalleCotizacionForm" >
+    <div class="col-span-1 mr-2">
+      <div class="grid grid-cols-2 gap-5">
 
-      <!-- <p>Hora inicio servicio: </p> -->
-      <form [formGroup]="listaDeHoras">
+        <!-- <p class="text-lg">Cantidad de puestos</p> -->
         <mat-form-field class="w-full mt-10">
-          <mat-label>Hora inicio servicio</mat-label>
-          <mat-select formControlName="minutosInicioServicio" id="1" (selectionChange)="onHourChange($event)">
-            <mat-option *ngFor="let hora of listaHoras" [disabled]="!editMode"
-              [value]="hora.toString()">{{hora}}</mat-option>
+          <mat-label>Cantidad de puestos</mat-label>
+          <input matInput type="number" formControlName="cantidadServicios">
+        </mat-form-field>
+
+        <!-- <p>Servicio</p> -->
+        <mat-form-field class="w-full mt-10">
+          <mat-label>Selecciona el servicio</mat-label>
+          <mat-select formControlName="idServicio">
+            <mat-option *ngIf="!editMode">Selecciona el servicio</mat-option>
+            <mat-option *ngFor="let servicio of listaServicios" [disabled]="!editMode" [value]="servicio.idServicio">
+              {{servicio.nombre}}
+            </mat-option>
           </mat-select>
         </mat-form-field>
-      </form>
-    </div>
 
-    <div class="col-span-1 ml-2">
-      <!-- <p>Servicio</p> -->
-      <mat-form-field class="w-full">
-        <mat-label>Selecciona el servicio</mat-label>
-        <mat-select formControlName="idServicio">
-          <mat-option *ngIf="!editMode">Selecciona el servicio</mat-option>
-          <mat-option *ngFor="let servicio of listaServicios" [disabled]="!editMode" [value]="servicio.idServicio">
-            {{servicio.nombre}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-
-      <!-- <p>Sucursal: </p> -->
-      <mat-form-field class="w-full mt-10">
-        <mat-label>Seleccionar sucursal</mat-label>
-        <mat-select formControlName="idSucursal">
-          <mat-option *ngFor="let sucursal of listaSucursales" [value]="sucursal.idSucursal"
-            [disabled]="!editMode">{{sucursal.nombre}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-      <form [formGroup]="listaDeHoras">
+        <!-- <p>Dias requeridos del servicio: </p> -->
         <mat-form-field class="w-full mt-10">
-          <mat-label>Hora fin servicio</mat-label>
-          <mat-select formControlName="minutosFinServicio" id="2" (selectionChange)="onHourChange($event)">
-            <mat-option *ngFor="let hora of listaHoras" [disabled]="!editMode"
-              [value]="hora.toString()">{{hora}}</mat-option>
+          <mat-label class="text-sm">Días requeridos del servicio</mat-label>
+          <mat-select multiple [formControl]="diasSeleccionados" (selectionChange)="onDiaChange($event)">
+            <mat-option *ngFor="let dia of diasDeLaSemana" [value]="dia">{{dia}}</mat-option>
           </mat-select>
         </mat-form-field>
-      </form>
+
+        <!-- <p>Sucursal: </p> -->
+        <mat-form-field class="w-full mt-10" *ngIf="defaultDetalle">
+          <mat-label>Seleccionar sucursal</mat-label>
+          <mat-select formControlName="idSucursal">
+            <mat-option *ngFor="let sucursal of listaSucursales" [value]="sucursal.idSucursal"
+              [disabled]="!editMode">{{sucursal.nombre}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- <p>Hora inicio servicio: </p> -->
+        <form [formGroup]="listaDeHoras">
+          <mat-form-field class="w-full mt-10">
+            <mat-label>Hora inicio servicio</mat-label>
+            <mat-select formControlName="minutosInicioServicio" id="1" (selectionChange)="onHourChange($event)">
+              <mat-option *ngFor="let hora of listaHoras" [disabled]="!editMode"
+                [value]="hora.toString()">{{hora}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+
+        <!-- Hora fin servicio -->
+        <form [formGroup]="listaDeHoras">
+          <mat-form-field class="w-full mt-10">
+            <mat-label>Hora fin servicio</mat-label>
+            <mat-select formControlName="minutosFinServicio" id="2" (selectionChange)="onHourChange($event)">
+              <mat-option *ngFor="let hora of listaHoras" [disabled]="!editMode"
+                [value]="hora.toString()">{{hora}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+        <div class="w-full container-text pr-10 flex justify-center mt-10">
+          <mat-checkbox class="example-margin mb-5" [checked]="armado" [disabled]="!editMode" (click)="changeArmado()"><span
+              class="text-lg">Armado</span></mat-checkbox>
+        </div>
+
+      </div>
     </div>
-    <div class="col-span-1 imagen">
+    <div class="col-span-1 imagen" *ngIf="defaultDetalle">
     </div>
-    <form [formGroup]="valorDiasSelect">
-      <mat-form-field class="w-full" *ngFor="let item of diasSeleccionados.value" >
-        <mat-label>{{item}}</mat-label>
-        <input matInput type="number" formControlName="{{item}}" name="{{item}}" (keyup)="valueDayChange($event)" max="5">
-        <span *ngIf="isValidField(item)">El campo no puede ser menor a 1 o mayor a 4</span>
-      </mat-form-field>
-    </form>
-    <div class="w-full container-text pr-10">
-      <mat-checkbox class="example-margin mb-5" [checked]="armado" [disabled]="!editMode" (click)="changeArmado()"><span
-          class="text-lg">Armado</span></mat-checkbox>
-    </div>
-    <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text col-span-3"
-      formControlName="detalleServicio" [disabled]="!editMode" placeholder="Descripción..."></textarea>
+
+
   </form>
-  <div class="w-full flex justify-end" *ngIf="!editMode">
-    <!-- <button mat-flat-button color="primary" class="mr-5 mt-10 width-28" (click)="editarDetalleCotizacion()">Editar</button> -->
-    <button mat-flat-button color="warn" class="mr-10 mt-10 width-28" (click)="onNoClick()">Cerrar</button>
+  <form [formGroup]="valorDiasSelect" class="flex p-5 gap-5" [ngClass]="defaultDetalle ? '':'mx-40'">
+    <mat-form-field class="w-52" *ngFor="let item of diasSeleccionados.value">
+      <mat-label>{{item}}</mat-label>
+      <input matInput type="number" formControlName="{{item}}" name="{{item}}" (keyup)="valueDayChange($event)" max="5">
+      <span *ngIf="isValidField(item)">El campo no puede ser menor a 1 o mayor a 4</span>
+    </mat-form-field>
+  </form>
+  <div>
+    <textarea class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md input-text col-span-3" *ngIf="defaultDetalle"
+      formControlName="detalleServicio" placeholder="Descripción..."></textarea>
   </div>
-  <div class="w-full flex justify-end" *ngIf="editMode">
-    <button mat-flat-button color="primary" class="mr-5 mt-10 width-28"
-      (click)="guardarDetalleCotizacion()">Guardar</button>
-    <button mat-flat-button color="warn" class="mr-10 mt-10 width-28 "
-      (click)="editMode = !editMode; onNoClick()">Descartar</button>
+
+  <div *ngIf="defaultDetalle; else buttonQuoteComponent">
+    <div class="w-full flex justify-end" *ngIf="!editMode">
+      <!-- <button mat-flat-button color="primary" class="mr-5 mt-10 width-28" (click)="editarDetalleCotizacion()">Editar</button> -->
+      <button mat-flat-button color="warn" class="mr-10 mt-10 width-28" (click)="onNoClick()">Cerrar</button>
+    </div>
+    <div class="w-full flex justify-end" *ngIf="editMode">
+      <button mat-flat-button color="primary" class="mr-5 mt-10 width-28" (click)="guardarDetalleCotizacion()"
+        [disabled]="!validateInfoBeforeSave()">Guardar</button>
+      <button mat-flat-button color="warn" class="mr-10 mt-10 width-28 "
+        (click)="editMode = !editMode; onNoClick();">Descartar</button>
+    </div>
   </div>
+  <ng-template #buttonQuoteComponent>
+    <div class="w-full flex justify-center">
+      <button (click)="getValueOfQuote()" class="button" [disabled]="!validateSecondButton()">
+        Obtener valor
+      </button>
+    </div>
+  </ng-template>
+  <article *ngIf="!defaultDetalle" class="mt-10" >
+    <div class="divInformation text-grisText">
+      <p class="text text-2xl text-grisText">Información de la cotización</p>
+      <p>{{detalleCotizacionForm.value.total | currency:'COP':'symbol-narrow':'1.2-2' }}</p>
+    </div>
+
+  </article>
 </section>
 <mat-card-footer>
   <mat-progress-bar mode="indeterminate" *ngIf="loading" color="bg-blue-500"></mat-progress-bar>
 </mat-card-footer>
-
-

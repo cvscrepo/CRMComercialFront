@@ -4,6 +4,8 @@ import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
 import { ListaCotizacionPageComponent } from './pages/lista-cotizacion-page/lista-cotizacion-page.component';
 import { NewCotizacionPageComponent } from './pages/new-cotizacion-page/new-cotizacion-page.component';
 import { DetalleCotizacionPageComponent } from './pages/detalle-cotizacion-page/detalle-cotizacion-page.component';
+import { ClientsPageComponent } from './pages/clients-page/clients-page.component';
+import { CotizadorPageComponent } from './pages/cotizador-page/cotizador-page.component';
 
 const routes: Routes = [{
   path: '',
@@ -11,6 +13,8 @@ const routes: Routes = [{
   children: [
     {path: 'list', component: ListaCotizacionPageComponent},
     {path: 'newcotizacion', component: NewCotizacionPageComponent},
+    {path: 'clients', component: ClientsPageComponent},
+    {path: 'cotizador', component: CotizadorPageComponent},
     {path: 'detallecotizacion/:id', component: DetalleCotizacionPageComponent},
     {path: '**', redirectTo: 'list'}
   ]

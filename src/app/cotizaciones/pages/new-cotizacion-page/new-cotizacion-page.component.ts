@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CotizacionService } from '../../services/cotizacion.service';
 
 @Component({
@@ -9,7 +9,6 @@ import { CotizacionService } from '../../services/cotizacion.service';
 export class NewCotizacionPageComponent implements OnDestroy {
 
   constructor(private _cotizacionService: CotizacionService){
-
   }
 
   ngOnDestroy(): void {

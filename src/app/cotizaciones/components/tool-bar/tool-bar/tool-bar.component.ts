@@ -13,11 +13,13 @@ export class ToolBarComponent implements AfterViewChecked, OnInit {
   //if the number type is 0, its the desault type, 1 detail type
   @Input()
   public type: number = 1;
+  @Output()
+  public createdCliked = new EventEmitter<void>();
 
   public title: string = "";
 
   @Output()
-  public termBusqueda:EventEmitter<string>= new EventEmitter<string>();
+  public termBusqueda : EventEmitter<string>= new EventEmitter<string>();
 
   constructor(
     private servicioCotizaciones : CotizacionService,
@@ -33,6 +35,9 @@ export class ToolBarComponent implements AfterViewChecked, OnInit {
   ngAfterViewChecked(): void {
     if(this.route.url === "/cotizacion/list"){
       this.title = "Lista de cotizaciones";
+    }
+    if(this.route.url === '/cotizacion/clients'){
+      this.title = "Lista de clientes";
     }
     if(this.servicioCotizaciones.cotizacionById?.nombre){
       this.title = this.servicioCotizaciones.form!.get('nombre')?.value;
@@ -52,4 +57,8 @@ export class ToolBarComponent implements AfterViewChecked, OnInit {
     return this.servicioCotizaciones.isDisabled;
   }
 
+  onCreatedClicked(){
+    console.log("Hello");
+    this.createdCliked.emit();
+  }
 }

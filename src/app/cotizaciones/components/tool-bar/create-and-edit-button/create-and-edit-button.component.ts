@@ -1,7 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, output } from '@angular/core';
 import { CotizacionService } from '../../../services/cotizacion.service';
 import { responseApi } from '../../../../shared/interfaces/response.interface';
 import { Cotizacion } from '../../../interfaces/cotizacion.interface';
+import { FormArray } from '@angular/forms';
+import { DetalleCotizacion } from '../../../interfaces/detalleCotizacion.interface';
+import { ClienteService } from '../../../services/cliente.service';
 
 @Component({
   selector: 'crm-create-and-edit-button',
@@ -16,8 +19,14 @@ export class CreateAndEditButtonComponent {
   public newCotizacionObjetc?:Cotizacion;
 
   @Output() saveCotizacion = new EventEmitter<Cotizacion>();
-  constructor(private cotizacionService:CotizacionService){
+  @Output() createdClicked = new EventEmitter<void>();
 
+  public isValid:boolean = false;
+
+  constructor(
+    private cotizacionService:CotizacionService,
+    private clientService : ClienteService
+  ){
   }
 
   getLoading(){
@@ -47,6 +56,24 @@ export class CreateAndEditButtonComponent {
     }
   }
 
+  validateInformationBeforeSave(): boolean {
+    // Obtenemos la validez del formulario
+    let validForm: boolean = this.cotizacionService.form?.valid || false;
+
+    // Obtenemos la lista de detalles de cotización
+    let detallesList: FormArray<any> = this.cotizacionService.form?.get('detalleCotizacions') as FormArray || new FormArray([]);
+    let validDetalle: boolean = detallesList.length > 0;
+
+    // Imprimimos los valores para depuración
+    console.log('Detalle Válido:', validDetalle, 'Formulario Válido:', validForm);
+
+    // Validamos que ambas condiciones sean verdaderas
+    this.isValid = validForm && validDetalle;
+    console.log(this.isValid)
+    return this.isValid;
+}
+
+
   public editCotizacion(){
     this.cotizacionService.setEditMode();
     this.cotizacionService.form!.enable();
@@ -59,4 +86,9 @@ export class CreateAndEditButtonComponent {
     this.typeButtons = 2;
     window.location.reload();
   }
+
+  openCreateDialog(){
+    this.createdClicked.emit();
+  }
+
 }

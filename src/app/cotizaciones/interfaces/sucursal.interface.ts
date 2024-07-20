@@ -4,5 +4,5 @@ export interface Sucursal {
   nombre:     string;
   direccion:  string;
   createdAt:  string;
-  updatedAt:  null;
+  updatedAt:  string;
 }

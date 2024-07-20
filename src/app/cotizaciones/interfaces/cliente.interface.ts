@@ -1,3 +1,5 @@
+import { Sucursal } from "./sucursal.interface";
+
 export interface Cliente {
   idCliente:      number;
   createdBy:      number;
@@ -10,4 +12,5 @@ export interface Cliente {
   telefono:       string;
   createdAt:      string;
   uptadtedAt:     null;
+  sucursals:      Sucursal[];
 }

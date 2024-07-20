@@ -13,21 +13,21 @@ import { FormArray } from '@angular/forms';
   templateUrl: './lista-detalle-cotizacion.component.html',
   styleUrl: './lista-detalle-cotizacion.component.css'
 })
-export class ListaDetalleCotizacionComponent implements OnInit{
+export class ListaDetalleCotizacionComponent implements OnInit {
   @Input()
-  public dataList:any[]=[];
+  public dataList: any[] = [];
   @Input()
   public displayedColumns: string[] = [];
 
 
-  dataSource:DetalleCotizacion[] = [];
+  dataSource: DetalleCotizacion[] = [];
 
   constructor(
     private cotizacionService: CotizacionService,
     public dialog: MatDialog,
     private detalleCotizacionService: DetalleCotizacionService,
     private utilidadService: UtilidadService
-  ){
+  ) {
   }
 
   ngOnInit(): void {
@@ -36,9 +36,9 @@ export class ListaDetalleCotizacionComponent implements OnInit{
     // })
     console.log("Lista de detalles");
     console.log(this.dataList);
-    if(this.dataList.length === 0){
+    if (this.dataList.length === 0) {
       this.dataSource = this.dataList;
-    }else{
+    } else {
       this.dataSource = [...this.dataList];
     }
   }
@@ -52,32 +52,44 @@ export class ListaDetalleCotizacionComponent implements OnInit{
 
   }
 
-  public getDisabledState(){
+  public getDisabledState() {
     return this.cotizacionService.isDisabled;
   }
 
-  onSelectDetail(detalle :DetalleCotizacion, index : number):void{
+  onSelectDetail(detalle: DetalleCotizacion, index: number): void {
     const dialogRef = this.dialog.open(DetailCotizacionComponent, {
-      data : {detalle, editMode: this.getDisabledState(), newDetail: false, index }
+      data: { detalle, editMode: this.getDisabledState(), newDetail: false, index }
     });
   }
 
-  onDeleteDetailCotizacion(detail : DetalleCotizacion, index: number){
+  onDeleteDetailCotizacion(detail: DetalleCotizacion, index: number) {
     this.cotizacionService.setLoading();
-    if(this.cotizacionService.nuevaCotizacion){
-      // const listaCotizacion = this.cotizacionService.getDetalleCotizacionToCreate();
-      // listaCotizacion.splice(index, 1);
+    if (this.cotizacionService.nuevaCotizacion) {
+      this.cotizacionService.deleteDetalleCotizacion(detail.idDetalleCotizacion);
       this.cotizacionService.setLoading();
-      return;
+      return this.utilidadService.mostrarAlerta("Detalle cotización eliminado con éxito antes de guardar", "Hagamos otros!", "bottom", "center");
+    } else {
+      this.detalleCotizacionService.deleteDetalleCotizacion(detail.idDetalleCotizacion).subscribe({
+        next: (data) => {
+          this.cotizacionService.deleteDetalleCotizacion(detail.idDetalleCotizacion);
+          this.utilidadService.mostrarAlerta("Detalle cotización eliminado con éxito", "Hagamos otros!", "bottom", "center");
+        },
+        complete: () => { this.cotizacionService.setLoading(); },
+        error: (e) => {
+          console.log("Error al eliminar el detalle cotización");
+          console.error(e);
+          this.utilidadService.mostrarAlerta("Detalle cotización no pudo ser eliminado", "Error!!!", "bottom", "center");
+          this.cotizacionService.setLoading()
+        }
+      });
     }
-    this.detalleCotizacionService.deleteDetalleCotizacion(detail.idDetalleCotizacion).subscribe({
-      next: (data)=>{ this.utilidadService.mostrarAlerta("Detalle cotización eliminado con éxito", ":(", "bottom", "center");},
-      complete: ()=> {this.cotizacionService.setLoading();},
-      error: ()=> {this.utilidadService.mostrarAlerta("Detalle cotización no pudo ser eliminado", "Error!!!", "bottom", "center"); this.cotizacionService.setLoading()}
-    });
   }
 
-  getOrderedData(element: any):any[]{
-    return this.displayedColumns.map((column)=> column !== 'Eliminar' ? element[column] : '');
+  getOrderedData(element: any): any[] {
+    return this.displayedColumns.map((column) => column !== 'Eliminar' ? element[column] : '');
+  }
+
+  get disabledState() {
+    return this.cotizacionService.disabledState;
   }
 }

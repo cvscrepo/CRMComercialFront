@@ -1,0 +1,16 @@
+<section class="container">
+  <h3 class="title">Sucursal</h3>
+  <form [formGroup]="sucursalForm" class="mt-5 form">
+    <mat-form-field class="example-full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre">
+    </mat-form-field>
+    <mat-form-field class="example-full-width">
+      <mat-label>Dirección</mat-label>
+      <input matInput formControlName="direccion">
+    </mat-form-field>
+  </form>
+  <div class="buttonsPosition gap-2">
+    <button mat-flat-button color="primary" [disabled]="stateOfSucursal" (click)="saveSucursal()"> Guardar</button>
+  </div>
+</section>

@@ -34,8 +34,10 @@ export interface CotizacionDTO {
   idCliente:           number;
   idUsuario:           number;
   nombre:              string;
-  descripcion:         string;
   estado:              number;
+  expiracion:          Date;
   total:               number;
+  descripcion:         string;
+  comentarios:         string;
   detalleCotizacions:  DetalleCotizacion[];
 }

@@ -59,17 +59,18 @@ export class CotizacionService {
 
   private initForm() {
     const form = this.fb.group({
-      idCotizacion: [0, [Validators.required]],
+      idCotizacion: [0],
       nombre: ['', [Validators.required]],
       idCliente: [0, [Validators.required]],
       idUsuario: [0, [Validators.required]],
+      numeroDocumento: [0],
       expiracion: ['', [Validators.required]],
       descripcion: [''],
       comentarios: [''],
-      estado: [2, [Validators.required]],
+      estado: [2],
       detalleCotizacions: this.fb.array([]),
-      total : [0, [Validators.required]],
-      valorIva : [0, [Validators.required]],
+      total : [0],
+      valorIva : [0],
 
     });
     this.formSubject.next(form);
@@ -114,11 +115,7 @@ export class CotizacionService {
       );
   }
 
-  getValueOfDetalleCotizacion(detalleCotizacion:DetalleCotizacion){
-    return this.http.post<responseApi<number>>(`${this.urlBase}/api/DetalleCotizacion/valor`, detalleCotizacion).pipe(
-      tap((data) => {console.log(data)})
-    );
-  };
+
 
   saveEntireCotizacion(cotizacion:CotizacionDTO){
     return this.http.post<responseApi<Cotizacion>>(`${this.urlBase}/api/Cotizacion`, cotizacion)
@@ -129,6 +126,9 @@ export class CotizacionService {
     )
   }
 
+  openCreateCotizacionDetail(){
+    this.route.navigate(['/cotizacion/newcotizacion'])
+  }
 
 
   get cotizacionByIdValue(){
@@ -168,21 +168,26 @@ export class CotizacionService {
       idUsuario: this.form?.get('idUsuario')?.value,
       nombre: this.form?.get('nombre')?.value,
       //Este editado por hay que colocar el usuario que está actualmente en la sesión
-      descripcion: this.form?.get('descripcion')?.value,
-      estado: this.form?.get('estado')?.value,
+      estado: this.form?.get('estado')?.value ?? 2,
+      expiracion: this.form?.get('expiracion')?.value,
       total: 0,
+      descripcion: this.form?.get('descripcion')?.value,
+      comentarios: this.form?.get('comentarios')?.value,
       detalleCotizacions: this.form?.get('detalleCotizacions')?.value
     }
     console.log(cotizacionACrear);
     this.saveEntireCotizacion(cotizacionACrear).subscribe({
       next: (data)=> {
         console.log(data.value);
-        this.route.navigate(['./cotizacion/list']);
+        this.nuevaCotizacion = false;
+        this.route.navigate(['./cotizacion/list']).then(() => {
+          window.location.reload();
+        });
       },
       error: (e)=> {
         console.error(e);
       }
-    });
+      });
   }
 
   editarCotizacion() {
@@ -205,8 +210,8 @@ export class CotizacionService {
 
   resetForm(){
     this.form?.reset();
-    // let detalles = this.form?.get('detalleCotizacions') as FormArray;
-    // detalles?.setValue([]);
+    let detalles = this.form?.get('detalleCotizacions') as FormArray;
+    detalles?.clear();
     this.myFormStates?.reset();
   }
 
@@ -225,7 +230,10 @@ export class CotizacionService {
   listarSucursal(idCliente: number): Observable<responseApi<Sucursal[]>> {
     return this.http.get<responseApi<Sucursal[]>>(`${this.urlBase}/api/Sucursal/id?id=${idCliente}`)
       .pipe(
-        tap(data => { console.log(data.value); this.listaSucursal = [...data.value] }),
+        tap(data => {
+          console.log(data.value);
+          this.listaSucursal = [...data.value]
+        }),
         catchError((e: any) => { console.error(e.message); return throwError(e) })
       )
   }
@@ -264,6 +272,25 @@ export class CotizacionService {
 
   sortOriginalCotizacion() {
     localStorage.setItem("cotizaciones", JSON.stringify(this.cotizacionList));
+  }
+
+  //CRUD de detalles cotización al form
+  editDetalleCotizacion(detalle: DetalleCotizacion, indexIn: number):void {
+    let detalleCotizacions = this.form?.get('detalleCotizacions') as FormArray;
+    detalleCotizacions.value.forEach((element: DetalleCotizacion, index: number) => {
+      if (index === indexIn) {
+        detalleCotizacions.at(index).patchValue(detalle);
+      }
+    });
+  }
+
+  deleteDetalleCotizacion(idDetalleCotizacion: number): void {
+    let detalleCotizacions = this.form?.get('detalleCotizacions') as FormArray;
+    detalleCotizacions.value.forEach((element: DetalleCotizacion, index: number) => {
+      if (element.idDetalleCotizacion === idDetalleCotizacion) {
+        detalleCotizacions.removeAt(index);
+      }
+    });
   }
 
 }

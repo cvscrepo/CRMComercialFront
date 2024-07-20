@@ -6,7 +6,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './lateral-list.component.css'
 })
 export class LateralListComponent {
-  public typeTable = false;
+  public typeTable:number = 2;
   @Input()
   public termBusqueda: string = "";
 

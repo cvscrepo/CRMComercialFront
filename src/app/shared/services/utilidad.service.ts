@@ -10,7 +10,7 @@ export class UtilidadService {
     this._snackBar.open(mensaje,tipo, {
       horizontalPosition: horizontalPosition,
       verticalPosition:verticalPosition,
-      duration:4000
+      duration:5000
     })
   }
 

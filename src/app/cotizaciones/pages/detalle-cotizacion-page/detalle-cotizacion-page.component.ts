@@ -32,8 +32,13 @@ export class DetalleCotizacionPageComponent  {
     private detalleService: DetalleCotizacionService,
     private clienteService: ClienteService,
     private usuarioService: UsuarioService,
-  ) {}
+    private _cotizacionSerivice: CotizacionService
+  ) {
+    this._cotizacionSerivice.isDisabled = false;
+  }
 
-
+  openCreateCotizacionDialog(){
+    this._cotizacionSerivice.openCreateCotizacionDetail();
+  }
 
 }

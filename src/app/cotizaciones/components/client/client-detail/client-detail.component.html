@@ -1,0 +1,66 @@
+<section class="container">
+  <article>
+    <p class="text-2xl font-medium">Información del cliente</p>
+  </article>
+  <form action="" [formGroup]="clientForm" class="expmple-form mt-5">
+    <mat-form-field class="example-full-width">
+      <mat-label>Nombre cliente</mat-label>
+      <input matInput formControlName="nombreCompleto">
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width ml-4">
+      <mat-label>Nit / Cédula</mat-label>
+      <input matInput formControlName="nit">
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <mat-label>Nombre del contacto</mat-label>
+      <input matInput formControlName="nombreContacto">
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width ml-4">
+      <mat-label>Correo electrónico</mat-label>
+      <input matInput formControlName="email">
+    </mat-form-field>
+
+    <mat-form-field class="example-full-width">
+      <mat-label>Telefono</mat-label>
+      <input matInput formControlName="telefono">
+    </mat-form-field>
+    <mat-form-field class="example-full-width ml-4" *ngIf="clienteCreated">
+      <mat-label>Fecha de creación</mat-label>
+      <input disabled matInput [value]="createdDate | date: 'dd/MM/yyyy'">
+    </mat-form-field>
+    <mat-checkbox formControlName="prospecto">Prospecto</mat-checkbox>
+  </form>
+
+  <!-- Sucursales -->
+  <hr class="my-5">
+
+  <article>
+    <div>
+      <p class="text-lg font-medium">Sucursales</p>
+    </div>
+    <div>
+      <crm-generic-table [columns]="columns" [values]="sucursalValues"
+        (delete)="handleDeleteSucursal($event)" (detail)="openSucursal($event)" [stateOf]="!enabled" ></crm-generic-table>
+    </div>
+
+  </article>
+  <article class="mt-5">
+    <button mat-raised-button class="flex items-center justify-center text-lg" [disabled]="!enabled" (click)="newSucursalButton()">Nuevo <mat-icon aria-hidden="false" aria-label="Example home icon" class="" fontIcon="add"></mat-icon></button>
+    <!-- <button *ngIf="addSucursal" mat-raised-button>Agregar sucursal</button> -->
+  </article>
+  <section class="buttons-position">
+    <article *ngIf="data.idCliente; else buttonCreate">
+      <button mat-raised-button color="basic" class="mr-5 mt-10 width-28" (click)="enableClientForm()">Editar</button>
+      <button mat-flat-button color="primary" class="mr-10 mt-10 width-28 " (click)="uptadeClient()"
+        [disabled]="!enabled">Guardar</button>
+    </article>
+    <ng-template #buttonCreate>
+      <button mat-raised-button color="primary" class="mr-10 mt-10 width-28" (click)="createClient()"
+        [disabled]="enabled">Crear</button>
+    </ng-template>
+  </section>
+  {{clientForm.status}}
+</section>
